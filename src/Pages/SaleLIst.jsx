@@ -210,7 +210,7 @@ function SaleList() {
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Edit Sale</p>
+                      <p>Delete Sale</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -233,7 +233,10 @@ function SaleList() {
                   </Tooltip>
                 </TooltipProvider>
 
-                <button
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                    <button
                   className=" text-white px-1 py-1 rounded"
                   onClick={() => handleInvoice(sale.id)}
                 >
@@ -242,6 +245,14 @@ function SaleList() {
                     style={{ color: "#3e3f41" }}
                   ></i>
                 </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Invoice</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+               
               </TableCell>
             </TableRow>
           ))}
