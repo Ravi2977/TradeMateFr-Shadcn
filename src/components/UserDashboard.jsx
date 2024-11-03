@@ -40,6 +40,7 @@ const UserDashboard = () => {
     locality: "",
     district: "",
     country: "",
+    mobile:"",
     gstIn: "",
     gstType: "N/A",
     user: { id: userId },
@@ -91,6 +92,7 @@ const UserDashboard = () => {
         district: "",
         country: "",
         gstIn: "",
+        mobile:"",
         gstType: "N/A",
         user: { id: userId },
       });
@@ -153,6 +155,7 @@ const UserDashboard = () => {
               </h3>
               {[
                 "companyName",
+                "mobile",
                 "companyAddress",
                 "state",
                 "pinCode",

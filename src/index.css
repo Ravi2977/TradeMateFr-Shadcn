@@ -82,5 +82,17 @@
 }
 .highlight {
 border-left: 1px solid red;
+background-color: rgb(248, 238, 238);
   color: rgb(255, 0, 0);
+}
+
+@media print {
+  /* Hide everything except print-only content */
+  body * {
+    display: none;
+  }
+
+  .print-only {
+    display: block !important;
+  }
 }

@@ -44,7 +44,7 @@ const EditCompanyDialog = ({ company, onClose }) => {
   return (
   
         <form className="space-y-4">
-          {["companyName", "companyAddress", "state", "pinCode", "locality", "district", "country", "gstIn"].map((field) => (
+          {["companyName","mobile", "companyAddress", "state", "pinCode", "locality", "district", "country", "gstIn"].map((field) => (
             <Input
               key={field}
               name={field}
