@@ -7,6 +7,7 @@ import axiosInstance from "@/components/AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Swal from "sweetalert2";
+import Loader from "./ui/Loader";
 
 function Signin() {
   const [email, setEmail] = useState("");
@@ -15,13 +16,17 @@ function Signin() {
   const [isOtpGenerated, setIsOtpGenerated] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [isLoading,setLoading]=useState(false)
 
   const handleGenerateOtp = async () => {
+    setLoading(true)
     try {
       await axiosInstance.post("/auth/generate-otp", { email, password });
       setIsOtpGenerated(true);
       setError(null);
+      setLoading(false)
     } catch (e) {
+      setLoading(false)
       setError("Failed to generate OTP. Please check your credentials.");
     }
   };
@@ -149,7 +154,7 @@ function Signin() {
 
         {!isOtpGenerated ? (
           <Button className="w-full mb-4" onClick={handleGenerateOtp}>
-            <Mail className="mr-2 h-4 w-4" /> Generate OTP
+            <Mail className="mr-2 h-4 w-4" /> {isLoading ? <Loader className="mr-2" /> : "Generate OTP"}
           </Button>
         ) : (
           <Button className="w-full mb-4" onClick={handleSignIn}>

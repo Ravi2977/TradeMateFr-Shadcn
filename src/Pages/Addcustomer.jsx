@@ -5,6 +5,7 @@ import { Input } from "../components/ui/input";
 import axiosInstance from "@/components/AxiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "@/components/ui/Loader";
 
 function AddCustomer() {
   const [customerDetails, setCustomerDetails] = useState({
@@ -22,14 +23,13 @@ function AddCustomer() {
     },
   });
 
+  const [isLoading, setIsLoading] = useState(false); // Loader state
+
   const handleOnSubmit = async (e) => {
-    console.log("Submitting response ");
     e.preventDefault();
+    setIsLoading(true); // Start loading
     try {
-      const response = await axiosInstance.post(
-        `/customer/add`,
-        customerDetails
-      );
+      const response = await axiosInstance.post(`/customer/add`, customerDetails);
       if (response.status === 201) {
         toast.success("Customer Added");
         setCustomerDetails({
@@ -39,19 +39,20 @@ function AddCustomer() {
           country: "",
           pinCode: "",
           gstIn: "",
-          gstType: "N/A", // Reset to "N/A" after successful submission
+          gstType: "N/A",
           mobile: "",
-          email: "", // Reset email field
+          email: "",
           company: {
             companyId: localStorage.getItem("companyId"),
           },
         });
       } else {
-        toast.error("Either EMail or Mobile number allready Present");
+        toast.error("Either EMail or Mobile number already Present");
       }
     } catch (error) {
-      const errorMessage =
-      toast.error("Either EMail or Mobile number allready Present");
+      toast.error("Either EMail or Mobile number already Present");
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -138,7 +139,6 @@ function AddCustomer() {
           </div>
         </div>
 
-        {/* Conditionally render GSTIN input based on selected GST Type */}
         {customerDetails.gstType !== "N/A" && (
           <div>
             <Label htmlFor="gstIn">GSTIN</Label>
@@ -162,7 +162,6 @@ function AddCustomer() {
           />
         </div>
 
-        {/* New Email Input */}
         <div>
           <Label htmlFor="email">Email</Label>
           <Input
@@ -175,7 +174,9 @@ function AddCustomer() {
         </div>
 
         <div className="text-center">
-          <Button type="submit">Add Customer</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? <Loader className="mr-2" /> : "Add Customer"}
+          </Button>
         </div>
       </form>
       <ToastContainer />
