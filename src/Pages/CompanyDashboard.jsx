@@ -14,7 +14,7 @@ import { PencilIcon } from "lucide-react";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { toast } from "react-toastify";
 import Invoice from "@/components/Invoive";
-
+import { ActiveBarChart } from "@/components/Bar-chart";
 function CompanyDashboard() {
   const { changeValue, setChangeValue } = useAuth();
   const [company, setCompany] = useState(null);
@@ -216,9 +216,10 @@ function CompanyDashboard() {
           </DialogHeader>
         </DialogContent>
       </Dialog>
-
-      
+    <div className="h-96 w-96">
+    <ActiveBarChart/>
     </div>
+         </div>
   );
 }
 

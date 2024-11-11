@@ -108,7 +108,7 @@ function StockList() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto sm:w-full w-screen">
       <h2 className="text-xl font-semibold mb-4">Stock List</h2>
 
       <input
@@ -181,8 +181,8 @@ function StockList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {displayedStocks.map((stock, index) => (
-            <TableRow key={stock.itemId}>
+          {displayedStocks.slice().reverse().map((stock, index) => (
+            <TableRow key={stock.itemId} className={`${stock.quantity<5 &&"highlight"}`}>
               <TableCell className="px-4 py-2 text-center">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </TableCell>

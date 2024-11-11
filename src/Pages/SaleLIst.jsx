@@ -179,7 +179,7 @@ function SaleList() {
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="">
       <input
         type="text"
         placeholder="Search by customer..."
@@ -187,140 +187,138 @@ function SaleList() {
         onChange={handleSearchChange}
         className="mb-4 p-2 border border-gray-300 rounded"
       />
-      <Table className="min-w-full bg-white shadow-md rounded-lg">
-        <TableHeader>
-          <TableRow>
-            {/* <TableHead className="px-4 py-2">Select</TableHead> */}
-            <TableHead className="px-4 py-2">Sale Date</TableHead>
-            <TableHead className="px-4 py-2">Customer Name</TableHead>
-            <TableHead className="px-4 py-2">Item Name</TableHead>
-            <TableHead className="px-4 py-2">Quantity</TableHead>
-            <TableHead className="px-4 py-2">Total Amount(Rs.)</TableHead>
-            <TableHead className="px-4 py-2">GST(Rs.)</TableHead>
-            <TableHead className="px-4 py-2">Received Amount(Rs.)</TableHead>
-            <TableHead className="px-4 py-2">Remaining(Rs.)</TableHead>
-            <TableHead className="px-4 py-2">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentSalesData.map((sale) => (
-            <TableRow
-              key={sale.id}
-              className={sale.remaining > 0 ? "highlight" : ""}
-            >
-              {/* <TableCell className="px-4 py-2 border-b text-center">
-                <input
-                  type="checkbox"
-                  checked={selectedRows.has(sale.id)}
-                  onChange={() => handleCheckboxChange(sale.id)}
-                />
-              </TableCell> */}
-              <TableCell className="px-4 py-2 border-b text-center">
-                {formatDate(sale.date)}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.customer.customerName}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.item.itemName}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.quantity}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.totalAmmount}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.gstInRupee}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.receivedAmmount}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b text-center">
-                {sale.remaining}
-              </TableCell>
-              <TableCell className="flex text-center px-4 py-4 border-b">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      {" "}
-                      <button
-                        onClick={() => handleDelete(sale.id)}
-                        className="px-2 py-1"
-                      >
-                        <i
-                          className="fa-solid fa-trash fa-lg"
-                          style={{ color: "#3e3f41" }}
-                        ></i>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Delete</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <button
-                        className="text-white px-1 py-1 rounded"
-                        onClick={() =>
-                          openDialog(
-                            sale.id,
-                            sale.customer.customerName,
-                            sale.totalAmmount,
-                            sale.receivedAmmount,
-                            sale.remaining
-                          )
-                        }
-                      >
-                        <i
-                          className="fa-solid fa-money-bill-1-wave fa-xl"
-                          style={{ color: "#3e3f41" }}
-                        ></i>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add Received Money</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <Dialog>
-                  <DialogTrigger>
+      <div className="bg-white shadow-md rounded-lg w-full overflow-x-auto">
+        <div className="overflow-x-auto sm:w-full w-screen">
+          <Table className="min-w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="px-4 py-2">Sale Date</TableHead>
+                <TableHead className="px-4 py-2">Customer Name</TableHead>
+                <TableHead className="px-4 py-2">Item Name</TableHead>
+                <TableHead className="px-4 py-2">Quantity</TableHead>
+                <TableHead className="px-4 py-2">Total Amount (Rs.)</TableHead>
+                <TableHead className="px-4 py-2">GST (Rs.)</TableHead>
+                <TableHead className="px-4 py-2">
+                  Received Amount (Rs.)
+                </TableHead>
+                <TableHead className="px-4 py-2">Remaining (Rs.)</TableHead>
+                <TableHead className="px-4 py-2">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentSalesData.slice().reverse().map((sale) => (
+                <TableRow
+                  key={sale.id}
+                  className={sale.remaining > 0 ? "highlight" : ""}
+                >
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {formatDate(sale.date)}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.customer.customerName}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.item.itemName}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.quantity}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.totalAmmount}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.gstInRupee}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.receivedAmmount}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {sale.remaining}
+                  </TableCell>
+                  <TableCell className="flex items-center justify-center px-4 py-4 border-b">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <button className="text-white px-1 py-1 rounded">
+                          <button
+                            onClick={() => handleDelete(sale.id)}
+                            className="px-2 py-1"
+                          >
                             <i
-                              className="fa-solid fa-file-invoice fa-xl"
+                              className="fa-solid fa-trash fa-lg"
                               style={{ color: "#3e3f41" }}
                             ></i>
                           </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Invoice</p>
+                          <p>Delete</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                  </DialogTrigger>
-                  <DialogContent className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>
-                        Invoice for {sale.customer.customerName}
-                      </DialogTitle>
-                      <DialogDescription>
-                        <Invoice saleId={sale.id} />
-                      </DialogDescription>
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <button
+                            className="text-white px-1 py-1 rounded"
+                            onClick={() =>
+                              openDialog(
+                                sale.id,
+                                sale.customer.customerName,
+                                sale.totalAmmount,
+                                sale.receivedAmmount,
+                                sale.remaining
+                              )
+                            }
+                          >
+                            <i
+                              className="fa-solid fa-money-bill-1-wave fa-xl"
+                              style={{ color: "#3e3f41" }}
+                            ></i>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Add Received Money</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <Dialog>
+                      <DialogTrigger>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button className="text-white px-1 py-1 rounded">
+                                <i
+                                  className="fa-solid fa-file-invoice fa-xl"
+                                  style={{ color: "#3e3f41" }}
+                                ></i>
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Invoice</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </DialogTrigger>
+                      <DialogContent className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Invoice for {sale.customer.customerName}
+                          </DialogTitle>
+                          <DialogDescription>
+                            <Invoice saleId={sale.id} />
+                          </DialogDescription>
+                        </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
       <div className="mt-4">
         <Pagination>
           <PaginationContent>

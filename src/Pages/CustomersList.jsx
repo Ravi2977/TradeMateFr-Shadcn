@@ -51,7 +51,7 @@ function CustomersList() {
   const currentCustomers = customers.slice(startIndex, startIndex + pageSize);
 
   return (
-    <div className="p-4">
+    <div className="sm:w-full w-screen">
       <Table>
         <TableHeader>
           <TableRow>
@@ -67,7 +67,7 @@ function CustomersList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentCustomers.map((customer, index) => (
+          {currentCustomers.slice().reverse().map((customer, index) => (
             <TableRow key={customer.id}>
               <TableCell>{startIndex + index + 1}</TableCell>
               <TableCell>{customer.customerName}</TableCell>

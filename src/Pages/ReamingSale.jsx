@@ -29,13 +29,14 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import { toast } from "react-toastify";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import Invoice from "@/components/Invoive";
 
 // Helper function to format the date
 const formatDate = (dateString) => {
@@ -44,7 +45,7 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString("en-US", options).replace(/,/g, "");
 };
 
-function ReamingSale() {
+function SaleList() {
   const [salesData, setSalesData] = useState([]);
   const [company] = useState({ companyId: localStorage.getItem("companyId") });
   const [searchTerm, setSearchTerm] = useState("");
@@ -53,10 +54,16 @@ function ReamingSale() {
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10; // Number of items per page
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedSaleId, setSelectedSaleId] = useState(0);
+  const [totalAmountOfSelectedSale, setTotalAmountOfSelectedSale] = useState(0);
+  const [receivedAmountOfSelectedSale, setReceivedAmountOfSelectedSale] =
+    useState(0);
+  const [remainingOfSelected, setRemainingOfSelected] = useState(0);
+  const [customerName, setCustomerName] = useState("");
+  const [amount, setAmount] = useState("");
 
   const onSuccess = () => {
     toast.success("Amount Received");
-    setIsDialogOpen(false); // Close the dialog on success
   };
 
   useEffect(() => {
@@ -110,6 +117,7 @@ function ReamingSale() {
       setCurrentPage(page);
     }
   };
+
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -130,36 +138,48 @@ function ReamingSale() {
     });
   };
 
-  //dilog recevie amount
-  const [amount, setAmount] = useState("");
-
   const handleInputChange = (e) => {
     setAmount(e.target.value);
   };
 
-  const handleSubmit = async (e, saleId) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!amount || isNaN(amount) ) {
+    if (!amount || isNaN(amount)) {
       toast.error("Please enter a valid amount.");
       return;
     }
     try {
       await axiosInstance.put(`/sales/editsale`, {
-        id: saleId,
+        id: selectedSaleId,
         receivedAmmount: amount,
       });
-      if (onSuccess) {
-        onSuccess();
-      }
+      onSuccess();
+      setIsDialogOpen(false); // Close dialog on success
+      await loadSaleDetails(); // Reload sale details on success
     } catch (error) {
       console.error("Error receiving amount:", error);
       toast.error("Failed to process the payment.");
     }
   };
 
+  const openDialog = (
+    saleId,
+    customerName,
+    totalAmount,
+    receivedAmount,
+    remaining
+  ) => {
+    setIsDialogOpen(true);
+    setSelectedSaleId(saleId);
+    setRemainingOfSelected(remaining);
+    setTotalAmountOfSelectedSale(totalAmount);
+    setCustomerName(customerName);
+    setReceivedAmountOfSelectedSale(receivedAmount);
+  };
+
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto sm:w-full w-screen">
       <input
         type="text"
         placeholder="Search by customer..."
@@ -170,35 +190,16 @@ function ReamingSale() {
       <Table className="min-w-full bg-white shadow-md rounded-lg">
         <TableHeader>
           <TableRow>
-            <TableHead className="px-4 py-2 border-b">
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    const allIds = currentSalesData.map((sale) => sale.id);
-                    setSelectedRows(new Set(allIds));
-                  } else {
-                    setSelectedRows(new Set());
-                  }
-                }}
-              />
-            </TableHead>
-            <TableHead className="px-4 py-2 border-b">Date</TableHead>
-            <TableHead className="px-4 py-2 border-b">Customer Name</TableHead>
-            <TableHead className="px-4 py-2 border-b">Customer Email</TableHead>
-            <TableHead className="px-4 py-2 border-b">Quantity</TableHead>
-            <TableHead className="px-4 py-2 border-b">Rate</TableHead>
-            <TableHead className="px-4 py-2 border-b">Total Amount</TableHead>
-            <TableHead className="px-4 py-2 border-b">
-              Received Amount
-            </TableHead>
-            <TableHead className="px-4 py-2 border-b">
-              Remaining Amount
-            </TableHead>
-            <TableHead className="px-4 py-2 border-b">Purchase Item</TableHead>
-            <TableHead className="px-4 py-2 border-b text-center">
-              Action
-            </TableHead>
+            {/* <TableHead className="px-4 py-2">Select</TableHead> */}
+            <TableHead className="px-4 py-2">Sale Date</TableHead>
+            <TableHead className="px-4 py-2">Customer Name</TableHead>
+            <TableHead className="px-4 py-2">Item Name</TableHead>
+            <TableHead className="px-4 py-2">Quantity</TableHead>
+            <TableHead className="px-4 py-2">Total Amount(Rs.)</TableHead>
+            <TableHead className="px-4 py-2">GST(Rs.)</TableHead>
+            <TableHead className="px-4 py-2">Received Amount(Rs.)</TableHead>
+            <TableHead className="px-4 py-2">Remaining(Rs.)</TableHead>
+            <TableHead className="px-4 py-2">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -207,116 +208,114 @@ function ReamingSale() {
               key={sale.id}
               className={sale.remaining > 0 ? "highlight" : ""}
             >
-              <TableCell className="px-4 py-2 border-b">
+              {/* <TableCell className="px-4 py-2 border-b text-center">
                 <input
                   type="checkbox"
                   checked={selectedRows.has(sale.id)}
                   onChange={() => handleCheckboxChange(sale.id)}
                 />
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b">
+              </TableCell> */}
+              <TableCell className="px-4 py-2 border-b text-center">
                 {formatDate(sale.date)}
               </TableCell>
-              <TableCell className="px-4 py-2 border-b">
+              <TableCell className="px-4 py-2 border-b text-center">
                 {sale.customer.customerName}
               </TableCell>
-              <TableCell className="px-4 py-2 border-b">
-                {sale.customer.email}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b">
-                {sale.quantity}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b">{sale.rate}</TableCell>
-              <TableCell className="px-4 py-2 border-b">
-                {sale.totalAmmount}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b">
-                {sale.receivedAmmount}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b">
-                {sale.remaining}
-              </TableCell>
-              <TableCell className="px-4 py-2 border-b">
+              <TableCell className="px-4 py-2 border-b text-center">
                 {sale.item.itemName}
               </TableCell>
-              <TableCell className=" flex text-center px-4 py-4 border-b">
-                <Dialog onOpenChange={loadSaleDetails} >
-                  <DialogTrigger>
-                    <button
-                      className="text-white px-1 py-1 rounded mr-2"
-                      onClick={() => setIsDialogOpen(true)} // Open dialog on button click
-                    >
-                      <i
-                        className="fa-solid fa-money-bill-1-wave fa-xl"
-                        style={{ color: "#3e3f41" }}
-                      ></i>
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Receive Remaining Amount</DialogTitle>
-                      <DialogDescription>
-                        <div className="w-full max-w-md bg-white ">
-                          <div className="mb-4 text-center">
-                            <p>
-                              <strong>Customer:</strong>
-                              {sale.customer.customerName}
-                            </p>
-                            <p>
-                              <strong>Total Paid:</strong> Rs.
-                              {sale.receivedAmmount}
-                            </p>
-                            <p>
-                              <strong>Remaining Balance:</strong> Rs.
-                              {sale.remaining}
-                            </p>
-                          </div>
-                          <form
-                            onSubmit={(e) => handleSubmit(e, sale.id)}
-                            className="flex flex-col items-center"
-                          >
-                            <Label htmlFor="amount" className="mb-2">
-                              Amount to Receive(Rs.)
-                            </Label>
-                            <Input
-                              id="amount"
-                              type="number"
-                              value={amount}
-                              onChange={handleInputChange}
-                              placeholder="Enter amount"
-                              className="mb-4"
-                            />
-                            <Button
-                              type="submit"
-                              className="w-full bg-blue-600 text-white"
-                            >
-                              Receive Amount
-                            </Button>
-                          </form>
-                        </div>
-                      </DialogDescription>
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
-
+              <TableCell className="px-4 py-2 border-b text-center">
+                {sale.quantity}
+              </TableCell>
+              <TableCell className="px-4 py-2 border-b text-center">
+                {sale.totalAmmount}
+              </TableCell>
+              <TableCell className="px-4 py-2 border-b text-center">
+                {sale.gstInRupee}
+              </TableCell>
+              <TableCell className="px-4 py-2 border-b text-center">
+                {sale.receivedAmmount}
+              </TableCell>
+              <TableCell className="px-4 py-2 border-b text-center">
+                {sale.remaining}
+              </TableCell>
+              <TableCell className="flex text-center px-4 py-4 border-b">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
+                      {" "}
                       <button
-                        className=" text-white px-1 py-1 rounded"
-                        onClick={() => handleInvoice(sale.id)}
+                        onClick={() => handleDelete(sale.id)}
+                        className="px-2 py-1"
                       >
                         <i
-                          class="fa-solid fa-file-invoice fa-xl"
+                          className="fa-solid fa-trash fa-lg"
                           style={{ color: "#3e3f41" }}
                         ></i>
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Invoice</p>
+                      <p>Delete</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <button
+                        className="text-white px-1 py-1 rounded"
+                        onClick={() =>
+                          openDialog(
+                            sale.id,
+                            sale.customer.customerName,
+                            sale.totalAmmount,
+                            sale.receivedAmmount,
+                            sale.remaining
+                          )
+                        }
+                      >
+                        <i
+                          className="fa-solid fa-money-bill-1-wave fa-xl"
+                          style={{ color: "#3e3f41" }}
+                        ></i>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add Received Money</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <Dialog>
+                  <DialogTrigger>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <button className="text-white px-1 py-1 rounded">
+                            <i
+                              className="fa-solid fa-file-invoice fa-xl"
+                              style={{ color: "#3e3f41" }}
+                            ></i>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Invoice</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </DialogTrigger>
+                  <DialogContent className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>
+                        Invoice for {sale.customer.customerName}
+                      </DialogTitle>
+                      <DialogDescription>
+                        <Invoice saleId={sale.id} />
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               </TableCell>
             </TableRow>
           ))}
@@ -349,8 +348,45 @@ function ReamingSale() {
           </PaginationContent>
         </Pagination>
       </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Receive Remaining Amount</DialogTitle>
+            <DialogDescription>
+              <div className="w-full max-w-md bg-white ">
+                <div className="mb-4 ">
+                  <p>
+                    <b>Customer:</b> {customerName}
+                  </p>
+                  <p>
+                    <b>Total Amount:</b> {totalAmountOfSelectedSale}
+                  </p>
+                  <p>
+                    <b>Received Amount:</b> {receivedAmountOfSelectedSale}
+                  </p>
+                  <p>
+                    <b>Remaining Amount:</b> {remainingOfSelected}
+                  </p>
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="text-left">
+                    <Label htmlFor="amount">Enter Amount:</Label>
+                    <Input
+                      id="amount"
+                      value={amount}
+                      onChange={handleInputChange}
+                      className="mt-1"
+                    />
+                  </div>
+                  <Button type="submit">Receive Amount</Button>
+                </form>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-export default ReamingSale;
+export default SaleList;

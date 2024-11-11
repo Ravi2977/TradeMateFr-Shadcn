@@ -158,6 +158,7 @@ useEffect(()=>{
 console.log("CHnageing value")
 },[changeValue])
   return (
+  
     <Sidebar collapsible="icon" {...props}>
       <div className="text-right">
         {/* You can use changeValue here if needed */}
@@ -174,5 +175,6 @@ console.log("CHnageing value")
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
+
   );
 }
