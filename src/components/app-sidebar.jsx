@@ -91,15 +91,15 @@ const data = {
       items: [
         {
           title: "Add Purchase",
-          url: "#",
+          url: "/addpurchase",
         },
         {
           title: "Purchase List",
-          url: "#",
+          url: "/purchases",
         },
         {
           title: "Remainings",
-          url: "#",
+          url: "/raminngPurchases",
         },
       ],
     },
@@ -123,6 +123,25 @@ const data = {
         {
           title: "Most Sold Items",
           url: "#",
+        },
+      ],
+    },
+    {
+      title: "Seller Management",
+      url: "#",
+      icon: SquareTerminal,
+      items: [
+        {
+          title: "Add Seller",
+          url: "/addseller",
+        },
+        {
+          title: "Seller List",
+          url: "/sellers",
+        },
+        {
+          title: "Red Sellers",
+          url: "/redseller",
         },
       ],
     },

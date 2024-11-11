@@ -18,6 +18,10 @@ import ReamingSale from "./Pages/ReamingSale";
 import CompanyDashboard from "./Pages/CompanyDashboard";
 import CustomersList from "./Pages/CustomersList";
 import StockLIst from "./Pages/StockLIst";
+import AddSeller from "./Pages/AddSeller";
+import SellerList from "./Pages/SellerList";
+import AddPurchase from "./Pages/AddPurchase";
+import PurchaseList from "./Pages/PurchaseList";
 
 function App() {
   const isAuthenticated = localStorage.getItem("login");
@@ -41,6 +45,13 @@ function App() {
               <Route path="/company/:id" element={<CompanyDashboard />} />
               <Route path="/customers" element={<CustomersList />} />
               <Route path="/stocks" element={<StockLIst/>} />
+              <Route path="/addseller" element={<AddSeller/>} />
+              <Route path="/sellers" element={<SellerList/>} />
+              <Route path="/addpurchase" element={<AddPurchase/>} />
+              <Route path="/purchases" element={<PurchaseList/>} />
+
+
+
             </Routes>
           </main>
         </SidebarProvider>

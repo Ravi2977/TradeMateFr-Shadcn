@@ -100,7 +100,7 @@ const Invoice = ({saleId}) => {
               <TableCell className="font-semibold">Item</TableCell>
               <TableCell className="font-semibold">Quantity</TableCell>
               <TableCell className="font-semibold">Unit Price</TableCell>
-              <TableCell className="font-semibold">GST</TableCell>
+              {/* <TableCell className="font-semibold">GST</TableCell> */}
               <TableCell className="font-semibold">Total</TableCell>
             </TableRow>
           </TableHeader>
@@ -110,7 +110,7 @@ const Invoice = ({saleId}) => {
                 <TableCell>{sale.item.itemName}</TableCell>
                 <TableCell>{sale.quantity}</TableCell>
                 <TableCell>₹{sale.rate.toFixed(2)}</TableCell>
-                <TableCell>₹{sale.gstInRupee.toFixed(2)}</TableCell>
+                {/* <TableCell>₹{sale.gstInRupee.toFixed(2)}</TableCell> */}
                 <TableCell>₹{sale.totalAmmount.toFixed(2)}</TableCell>
               </TableRow>
             ))}

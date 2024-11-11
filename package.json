@@ -35,7 +35,8 @@
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.14.4",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -53,7 +54,6 @@
     "vite": "^5.4.9"
   },
   "overrides": {
-  "react-is": "^19.0.0-rc-69d4b800-20241021"
-}
-
+    "react-is": "^19.0.0-rc-69d4b800-20241021"
+  }
 }

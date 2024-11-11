@@ -96,7 +96,6 @@ const UserDashboard = () => {
         gstType: "N/A",
         user: { id: userId },
       });
-      
       closeDialog();
       fetchCompanies();
     } catch (e) {
