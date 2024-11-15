@@ -170,12 +170,23 @@ function SaleList() {
     receivedAmount,
     remaining
   ) => {
-    setIsDialogOpen(true);
+    if(remaining===0){
+
+      Swal.fire({
+        title: "No Remaining",
+        text: `Customer have Paid Complete Amount`,
+        icon: "warning",
+        // showCancelButton: true,
+        confirmButtonText: "OK",
+      })
+    }else{
+      setIsDialogOpen(true);
     setSelectedSaleId(saleId);
     setRemainingOfSelected(remaining);
     setTotalAmountOfSelectedSale(totalAmount);
     setCustomerName(customerName);
     setReceivedAmountOfSelectedSale(receivedAmount);
+    }
   };
 
   return (
@@ -197,7 +208,7 @@ function SaleList() {
                 <TableHead className="px-4 py-2">Item Name</TableHead>
                 <TableHead className="px-4 py-2">Quantity</TableHead>
                 <TableHead className="px-4 py-2">Total Amount (Rs.)</TableHead>
-                <TableHead className="px-4 py-2">GST (Rs.)</TableHead>
+                <TableHead className="px-4 py-2">Rate (Rs.)</TableHead>
                 <TableHead className="px-4 py-2">
                   Received Amount (Rs.)
                 </TableHead>
@@ -227,7 +238,7 @@ function SaleList() {
                     {sale.totalAmmount}
                   </TableCell>
                   <TableCell className="px-4 py-2 border-b text-center">
-                    {sale.gstInRupee}
+                    {sale.rate}
                   </TableCell>
                   <TableCell className="px-4 py-2 border-b text-center">
                     {sale.receivedAmmount}
@@ -258,7 +269,7 @@ function SaleList() {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <button
+                          <button 
                             className="text-white px-1 py-1 rounded"
                             onClick={() =>
                               openDialog(

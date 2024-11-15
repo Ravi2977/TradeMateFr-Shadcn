@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import html2pdf from "html2pdf.js";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axiosInstance from "./AxiosInstance";
 import {
   Table,
   TableHeader,
@@ -16,11 +11,10 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { toast } from "react-toastify";
-import axiosInstance from "./AxiosInstance";
 
-const Invoice = ({saleId}) => {
+const Invoice = ({ saleId }) => {
   const [invoiceData, setInvoiceData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchInvoiceData();
@@ -30,6 +24,7 @@ const Invoice = ({saleId}) => {
     try {
       const response = await axiosInstance.post(`/sales/byid/${saleId}`);
       setInvoiceData(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching invoice data", error);
       toast.error("Failed to fetch invoice data");
@@ -56,7 +51,12 @@ const Invoice = ({saleId}) => {
 
   return (
     <div>
-      <div id="invoice" className="p-4 bg-white shadow-md rounded-lg max-w-2xl mx-auto ">
+    
+
+      <div
+        id="invoice"
+        className="p-4 bg-white shadow-md rounded-lg max-w-2xl mx-auto "
+      >
         {/* Invoice Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold">Invoice</h1>
@@ -78,7 +78,7 @@ const Invoice = ({saleId}) => {
 
         {/* Company Information */}
         <div className="mb-4">
-          <h2 className="text-lg font-semibold">bill from:</h2>
+          <h2 className="text-lg font-semibold">Bill From:</h2>
           <p>{customerModel.company.companyName}</p>
           <p>
             {customerModel.company.companyAddress},{" "}
@@ -88,8 +88,37 @@ const Invoice = ({saleId}) => {
             {customerModel.company.country} - {customerModel.company.pinCode}
           </p>
           <p>Mobile: {customerModel.company.mobile}</p>
+
+          {/* Highlighted Account Details */}
+          <div className="bg-yellow-100 p-4 rounded-md mt-4">
+            <h2 className="text-lg font-semibold mb-2">Account Details</h2>
+            <table className="w-full text-left">
+              <tbody>
+                <tr>
+                  <td className="font-semibold py-1 pr-4">Bank:</td>
+                  <td>{customerModel.company.bankName}</td>
+                </tr>
+                <tr>
+                  <td className="font-semibold py-1 pr-4">
+                    Account Holder Name:
+                  </td>
+                  <td>{customerModel.company.companyName}</td>
+                </tr>
+                <tr>
+                  <td className="font-semibold py-1 pr-4">Account Number:</td>
+                  <td>{customerModel.company.accountNumber}</td>
+                </tr>
+                <tr>
+                  <td className="font-semibold py-1 pr-4">IFSC Code:</td>
+                  <td>{customerModel.company.ifscCode}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Conditional GST Information */}
           {customerModel.company.gstIn && (
-            <p>GSTIN: {customerModel.company.gstIn}</p>
+            <p className="mt-2">GSTIN: {customerModel.company.gstIn}</p>
           )}
         </div>
 
@@ -100,7 +129,6 @@ const Invoice = ({saleId}) => {
               <TableCell className="font-semibold">Item</TableCell>
               <TableCell className="font-semibold">Quantity</TableCell>
               <TableCell className="font-semibold">Unit Price</TableCell>
-              {/* <TableCell className="font-semibold">GST</TableCell> */}
               <TableCell className="font-semibold">Total</TableCell>
             </TableRow>
           </TableHeader>
@@ -110,7 +138,6 @@ const Invoice = ({saleId}) => {
                 <TableCell>{sale.item.itemName}</TableCell>
                 <TableCell>{sale.quantity}</TableCell>
                 <TableCell>₹{sale.rate.toFixed(2)}</TableCell>
-                {/* <TableCell>₹{sale.gstInRupee.toFixed(2)}</TableCell> */}
                 <TableCell>₹{sale.totalAmmount.toFixed(2)}</TableCell>
               </TableRow>
             ))}
