@@ -207,7 +207,6 @@ function AddSale() {
     setTotalQuantity(totalQuantity);
   }, [saleDetailsList]);
 
-  console.log(totalAmount, totalQuantity);
   return (
     <div className="p-3">
       {error && <p className="text-red-500 mb-4">{error}</p>}
