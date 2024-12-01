@@ -1,106 +1,56 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Rectangle, XAxis } from "recharts";
-
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from "recharts";
 
-export const description = "A bar chart with an active bar";
+import { Card, CardTitle } from "@/components/ui/card";
+import { ChartContainer } from "@/components/ui/chart";
 
-const chartData = [
-  { browser: "chrome", visitors: 187, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 275, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
-];
+export const description =
+  "A fully dynamic bar chart component for visualizing data.";
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-};
-
-export function ActiveBarChart() {
+export function ActiveBarChart({
+  chartData,
+  chartTitle,
+  xAxisKey,
+  barKeys,
+  barColors,
+  chartConfig,
+}) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Bar Chart - Active</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
-      </CardHeader>
-      <CardContent>
+      <div className="p-2">
+        <CardTitle>{chartTitle}</CardTitle>
         <ChartContainer config={chartConfig}>
-          <BarChart data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="browser"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-             
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar
-              dataKey="visitors"
-              strokeWidth={2}
-              radius={8}
-              activeIndex={2}
-              activeBar={({ ...props }) => (
-                <Rectangle
-                  {...props}
-                  fillOpacity={0.8}
-                  stroke={props.payload.fill}
-                  strokeDasharray={4}
-                  strokeDashoffset={4}
-                />
-              )}
-            />
+          <BarChart
+            data={chartData}
+            width={chartConfig.width || 500}
+            height={chartConfig.height || 300}
+            margin={chartConfig.margin || { top: 20, right: 20, left: 20, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={xAxisKey} tickLine={false} />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {barKeys.map((key, index) => (
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={barColors[index] || "hsl(var(--chart-1))"}
+                radius={chartConfig.barRadius || [8, 8, 0, 0]}
+              />
+            ))}
           </BarChart>
         </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
+      </div>
     </Card>
   );
 }

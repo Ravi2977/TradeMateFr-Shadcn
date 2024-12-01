@@ -21,6 +21,7 @@ import axiosInstance from "./AxiosInstance";
 import EditCompanyDialog from "./EditCompanyDialog";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/AuthContext/AuthContext";
+import axios from "axios";
 
 const UserDashboard = () => {
   const [companies, setCompanies] = useState([]);
@@ -54,11 +55,17 @@ const UserDashboard = () => {
   }, []);
 
   const fetchCompanies = async () => {
+    const token =localStorage.getItem("login") && JSON.parse(localStorage.getItem("login")).jwtToken; // Retrieve token from localStorage
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/company/all/${userId}`);
+      const response = await axios.get(`http://localhost:8080/company/all/${userId}`,{
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          'Authorization':`Bearer ${token}`
+        },
+      });
       setCompanies(response.data);
-      setError(null);
     } catch (error) {
       setError("Failed to load companies. Please try again.");
       console.error("Error fetching companies:", error);
