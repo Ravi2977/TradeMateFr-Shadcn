@@ -58,7 +58,7 @@ const UserDashboard = () => {
     const token =localStorage.getItem("login") && JSON.parse(localStorage.getItem("login")).jwtToken; // Retrieve token from localStorage
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:8080/company/all/${userId}`,{
+      const response = await axios.get(`https://backend.ravicomputer.online/company/all/${userId}`,{
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
