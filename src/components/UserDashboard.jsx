@@ -58,6 +58,7 @@ const UserDashboard = () => {
     const token =localStorage.getItem("login") && JSON.parse(localStorage.getItem("login")).jwtToken; // Retrieve token from localStorage
     try {
       setLoading(true);
+
       const response = await axiosInstance.get(`/company/all/${userId}`)
       setCompanies(response.data);
     } catch (error) {
