@@ -30,6 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import AddCustomer from "./Addcustomer";
+import AddStock from "./AddStock";
 
 function AddSale() {
   const [saleDetail, setSaleDetail] = useState({
@@ -66,6 +68,8 @@ function AddSale() {
   const [isItemFromOpen, setIsItemFormOpen] = useState(true);
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
+  const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
+  const [isAddNewItemOpen, setIsAddNewItemOpen] = useState(false);
 
   const handleSelectCustomer = (id, name) => {
     setSelectedCustomer({
@@ -167,6 +171,11 @@ function AddSale() {
     setShowItemDropdown(false);
   };
 
+  const handleClsoeItem = () => {
+    setIsAddNewItemOpen(false);
+    fetchProducts();
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -207,16 +216,31 @@ function AddSale() {
     setTotalQuantity(totalQuantity);
   }, [saleDetailsList]);
 
+  const handleDialogClose = () => {
+    setIsAddCustomerOpen(false);
+    fetchCustomers();
+  };
+
   return (
     <div className="p-3">
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <h1 className="text-center text-3xl font-bold mb-3">Add New Sale</h1>
-      <Input
-        className="w-96"
-        placeholder="Search Customer By Name"
-        value={searchCustomer}
-        onChange={(e) => setSearchCustomer(e.target.value)}
-      />
+      <div className="flex justify-between px-10">
+        <Input
+          className="w-96"
+          placeholder="Search Customer By Name"
+          value={searchCustomer}
+          onChange={(e) => setSearchCustomer(e.target.value)}
+        />
+        <div className="flex justify-between">
+          <Button onClick={() => setIsAddCustomerOpen(true)}>
+            Add New Customer
+          </Button>
+          <Button  className="ml-3" onClick={() => setIsAddNewItemOpen(true)}>
+            Add New Product
+          </Button>
+        </div>
+      </div>
       <div className="flex justify-start flex-wrap">
         {customers
           .filter((customer) =>
@@ -250,7 +274,6 @@ function AddSale() {
             </Card>
           ))}
       </div>
-
       {/* <div className="text-center">
         <Button type="submit">Add Sale</Button>
       </div> */}
@@ -263,7 +286,12 @@ function AddSale() {
               <div className="text-right mr-5">
                 {selectedCustomer.customerName}
               </div>
-              {isItemFromOpen ? "Add Sale Item with price" : "Added Items"}
+              <div className="flex justify-between p-2">
+                {isItemFromOpen ? "Add Sale Item with price" : "Added Items"}
+                <Button size="sm" onClick={() => setIsAddNewItemOpen(true)}>
+                  Add New Product
+                </Button>
+              </div>
             </DialogTitle>
             <DialogDescription>
               {isItemFromOpen && (
@@ -368,9 +396,7 @@ function AddSale() {
               {!isItemFromOpen && (
                 <div>
                   <Table>
-                    <TableCaption>
-                     
-                    </TableCaption>
+                    <TableCaption></TableCaption>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-center">Item Name</TableHead>
@@ -409,7 +435,7 @@ function AddSale() {
                     </TableBody>
                   </Table>
                   <div>
-                  <div>Total Quantity:- Rs.{totalQuantity}</div>
+                    <div>Total Quantity:- Rs.{totalQuantity}</div>
                     <div>Total Received:- Rs.{totalAmount}</div>
                   </div>
                   <div className="text-right mt-2">
@@ -426,6 +452,25 @@ function AddSale() {
                   </div>
                 </div>
               )}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isAddCustomerOpen} onOpenChange={handleDialogClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <AddCustomer isInModel={true} />
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAddNewItemOpen} onOpenChange={handleClsoeItem}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <AddStock isInModel={true} />
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

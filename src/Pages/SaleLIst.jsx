@@ -56,8 +56,7 @@ function SaleList() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSaleId, setSelectedSaleId] = useState(0);
   const [totalAmountOfSelectedSale, setTotalAmountOfSelectedSale] = useState(0);
-  const [receivedAmountOfSelectedSale, setReceivedAmountOfSelectedSale] =
-    useState(0);
+  const [receivedAmountOfSelectedSale, setReceivedAmountOfSelectedSale]=useState(0);
   const [remainingOfSelected, setRemainingOfSelected] = useState(0);
   const [customerName, setCustomerName] = useState("");
   const [amount, setAmount] = useState("");
@@ -217,7 +216,7 @@ function SaleList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {currentSalesData.slice().reverse().map((sale) => (
+              {currentSalesData.map((sale) => (
                 <TableRow
                   key={sale.id}
                   className={sale.remaining > 0 ? "highlight" : ""}

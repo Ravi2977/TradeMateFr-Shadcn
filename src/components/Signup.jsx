@@ -6,6 +6,17 @@ import logo from "../assets/Images/favicon.png";
 import axiosInstance from "@/components/AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -14,6 +25,7 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null); // For error handling
   const navigate = useNavigate();
+  const [openVerificationDialod, setOpenVerificationDialog] = useState(false);
 
   const handleSignup = async () => {
     if (password !== confirmPassword) {
@@ -26,7 +38,7 @@ function Signup() {
         password,
         name,
       });
-      navigate("/signin");
+      setOpenVerificationDialog(true);
     } catch (e) {
       setError("Signup failed. Please try again.");
     }
@@ -56,7 +68,10 @@ function Signup() {
 
         {/* Name Input */}
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Name
           </label>
           <Input
@@ -71,7 +86,10 @@ function Signup() {
 
         {/* Email Input */}
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <Input
@@ -86,7 +104,10 @@ function Signup() {
 
         {/* Password Input */}
         <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
             Password
           </label>
           <Input
@@ -101,7 +122,10 @@ function Signup() {
 
         {/* Confirm Password Input */}
         <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700"
+          >
             Confirm Password
           </label>
           <Input
@@ -122,11 +146,39 @@ function Signup() {
         {/* Signin Link */}
         <p className="text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Button variant="link" className="text-blue-600" onClick={() => navigate("/signin")}>
+          <Button
+            variant="link"
+            className="text-blue-600"
+            onClick={() => navigate("/signin")}
+          >
             Sign in
           </Button>
         </p>
       </div>
+      <AlertDialog open={openVerificationDialod}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Please Verify your Account Before Login
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              An Email has been sent to your this Email Account Please go to
+              email and verify your account by using verification link Thankk
+              you
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button onClick={() => navigate("/signin")}>Sign in </Button>
+            <Button
+              onClick={() =>
+                window.open("https://mail.google.com/mail/u/0/#inbox", "_blank")
+              }
+            >
+              Open Gmail Inbox
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

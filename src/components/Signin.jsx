@@ -16,17 +16,26 @@ function Signin() {
   const [isOtpGenerated, setIsOtpGenerated] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [isLoading,setLoading]=useState(false)
+  const [isLoading, setLoading] = useState(false);
 
   const handleGenerateOtp = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosInstance.post("/auth/generate-otp", { email, password });
-      setIsOtpGenerated(true);
-      setError(null);
-      setLoading(false)
+      const response = await axiosInstance.post("/auth/generate-otp", {
+        email,
+        password,
+      });
+
+      if (response.data==="Otp Sent") {
+        setIsOtpGenerated(true);
+        setError(null);
+      } else {
+        setError(response.data);
+      }
+
+      setLoading(false);
     } catch (e) {
-      setLoading(false)
+      setLoading(false);
       setError("Failed to generate OTP. Please check your credentials.");
     }
   };
@@ -39,13 +48,13 @@ function Signin() {
         otp: otp.join(""), // Join digits into a single string for API
       });
       if (response.data === "Otp is Incorrect") {
-        Swal.fire(response.data)
-      }else if(response.data === "Otp Expired"){
-        Swal.fire(response.data)
-      }else {
+        Swal.fire(response.data);
+      } else if (response.data === "Otp Expired") {
+        Swal.fire(response.data);
+      } else {
         localStorage.setItem("login", JSON.stringify(response.data));
         navigate("/dashboard");
-        window.location.reload()
+        window.location.reload();
       }
     } catch (e) {
       setError("Failed to sign in. Please check your credentials and OTP.");
@@ -154,7 +163,8 @@ function Signin() {
 
         {!isOtpGenerated ? (
           <Button className="w-full mb-4" onClick={handleGenerateOtp}>
-            <Mail className="mr-2 h-4 w-4" /> {isLoading ? <Loader className="mr-2" /> : "Generate OTP"}
+            <Mail className="mr-2 h-4 w-4" />{" "}
+            {isLoading ? <Loader className="mr-2" /> : "Generate OTP"}
           </Button>
         ) : (
           <Button className="w-full mb-4" onClick={handleSignIn}>
