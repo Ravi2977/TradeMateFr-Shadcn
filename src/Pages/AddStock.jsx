@@ -5,7 +5,7 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-const AddStock = () => {
+const AddStock = ({isInModel}) => {
   const [itemDetail, setItemDetail] = useState({
     itemName: "",
     purchasePrice: 0,
@@ -49,7 +49,7 @@ const AddStock = () => {
   };
 
   return (
-    <div className="sm:mx-64">
+    <div className={`${isInModel?"":"sm:mx-64"}`}>
       <form onSubmit={handleSubmit} className="space-y-4 p-4">
         <div className="flex flex-col space-y-2">
           <Label htmlFor="itemName">Item Name</Label>

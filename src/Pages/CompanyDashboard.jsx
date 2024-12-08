@@ -119,32 +119,86 @@ function CompanyDashboard() {
           alt="Company Sign and Stamp"
           className="mb-4 w-32 h-32 object-cover"
         />
-        <Dialog open={isEditing} onOpenChange={setIsEditing}>
-          <DialogTrigger asChild>
-            <Button onClick={handleEdit}>Edit</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Company Details</DialogTitle>
-              <DialogDescription>
-                {/* Editable Inputs */}
-                <div className="space-y-4">
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogTrigger asChild>
+          <Button onClick={handleEdit}>Edit</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Company Details</DialogTitle>
+            <DialogDescription>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  className="border p-1 w-full"
+                  placeholder="Account Number"
+                  value={companyNewInfo.accountNumber || ""}
+                  onChange={(e) =>
+                    setCompanyNewInfo({
+                      ...companyNewInfo,
+                      accountNumber: e.target.value,
+                    })
+                  }
+                />
+                <input
+                  type="text"
+                  className="border p-1 w-full"
+                  placeholder="Bank Name"
+                  value={companyNewInfo.bankName || ""}
+                  onChange={(e) =>
+                    setCompanyNewInfo({
+                      ...companyNewInfo,
+                      bankName: e.target.value,
+                    })
+                  }
+                />
+                <input
+                  type="text"
+                  className="border p-1 w-full"
+                  placeholder="IFSC Code"
+                  value={companyNewInfo.ifscCode || ""}
+                  onChange={(e) =>
+                    setCompanyNewInfo({
+                      ...companyNewInfo,
+                      ifscCode: e.target.value,
+                    })
+                  }
+                />
+                <Label>Upload Image of your sign with Stamp</Label>
+                <div className="relative mb-4">
                   <input
-                    type="text"
-                    className="border p-2 w-full rounded"
-                    placeholder="Account Number"
-                    value={companyNewInfo.accountNumber || ""}
-                    onChange={(e) =>
-                      setCompanyNewInfo({ ...companyNewInfo, accountNumber: e.target.value })
-                    }
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
                   />
-                  {/* Add more input fields as needed */}
-                  <Button onClick={handleSave}>Save</Button>
+                  <div className="border border-gray-300 w-32 h-32 rounded-md flex items-center justify-center relative">
+                    {base64Image ? (
+                      <img
+                        src={base64Image}
+                        alt="Uploaded Preview"
+                        className="object-cover w-full h-full rounded-md"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No Image Selected</span>
+                    )}
+                    <PencilIcon
+                      onClick={handlePenClick}
+                      className="absolute bottom-2 right-2 h-6 w-6 text-gray-600 cursor-pointer"
+                    />
+                  </div>
                 </div>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+              </div>
+              <div className="mt-4">
+                <Button onClick={handleSave}>Save</Button>
+                <Button onClick={() => setIsEditing(false)} className="ml-2">
+                  Cancel
+                </Button>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
       </div>
 
       {/* Chart Section */}
@@ -153,7 +207,7 @@ function CompanyDashboard() {
         <ActiveBarChart
           chartData={chartData}
           chartTitle="Sales & Purchases"
-          xAxisKey="date"
+          xAxisKey="productName"
           barKeys={["salesCount", "purchaseCount"]}
           barColors={["hsl(var(--chart-2))", "hsl(var(--chart-1))"]}
           chartConfig={{

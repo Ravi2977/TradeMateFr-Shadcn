@@ -6,7 +6,7 @@ import axiosInstance from "@/components/AxiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function AddSeller() {
+function AddSeller({isInModel}) {
   const [sellerDetails, setSellerDetails] = useState({
     sellerName: "",
     address: "",
@@ -58,7 +58,7 @@ function AddSeller() {
   };
 
   return (
-    <div className="sm:mx-64">
+    <div className={`${isInModel?"":"sm:mx-64"}`}>
       <h1 className="text-center text-3xl font-bold">Add New Seller</h1>
 
       <form className="space-y-6" onSubmit={handleOnSubmit}>

@@ -30,6 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import AddStock from "./AddStock";
+import AddSeller from "./AddSeller";
 
 function AddPurchase() {
   const [purchaseDetail, setPurchaseDetail] = useState({
@@ -68,6 +70,8 @@ function AddPurchase() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [searchSeller, setSearchSeller] = useState("");
+  const [isAddNewItemOpen,setIsAddNewItemOpen]=useState(false)
+  const [isAddNewSellerOpen,setIsAddNewSellerOepn]=useState(false)
   const handleSelectSeller = (id, name) => {
     setSelectedSeller({
       id: id,
@@ -85,6 +89,16 @@ function AddPurchase() {
     setPurchaseDetail((prev) => ({ ...prev, [name]: value }));
   };
 
+
+  const handleClsoeItem = () => {
+    setIsAddNewItemOpen(false);
+    fetchProducts();
+  };
+
+  const handleCLoseSellerMOdel=()=>{
+    setIsAddNewSellerOepn(false)
+    fetchSellers()
+  }
   const fetchSellers = async () => {
     try {
       const response = await axiosInstance.get(
@@ -203,12 +217,23 @@ function AddPurchase() {
     <div className="">
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <h1 className="text-center text-3xl font-bold">Add New Purchase</h1>
-      <Input
+    <div className="flex justify-between px-10">
+    <Input
         className="w-96"
         placeholder="Search Seller By Name"
         value={searchSeller}
         onChange={(e) => setSearchSeller(e.target.value)}
       />
+     <div className="flex justify-between">
+          <Button onClick={() => setIsAddNewSellerOepn(true)}>
+            Add New Seller
+          </Button>
+          <Button  className="ml-3" onClick={() => setIsAddNewItemOpen(true)}>
+            Add New Product
+          </Button>
+        </div>
+    </div>
+
       <div className="flex">
         {sellers
           .filter((seller) =>
@@ -250,7 +275,12 @@ function AddPurchase() {
               <div className="text-right mr-10">
                 Seller :- {selectedSeller.sellerName}
               </div>
-              {isItemFromOpen ? "Add Sale Item with price" : "Added Items"}
+             <div className="flex justify-between p-3">
+             {isItemFromOpen ? "Add Sale Item with price" : "Added Items"}
+              <Button size="sm" className="ml-3" onClick={() => setIsAddNewItemOpen(true)}>
+            Add New Product
+          </Button>
+             </div>
             </DialogTitle>
             <DialogDescription>
               {isItemFromOpen && (
@@ -431,6 +461,27 @@ function AddPurchase() {
                   </div>
                 </div>
               )}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAddNewItemOpen} onOpenChange={handleClsoeItem}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <AddStock isInModel={true} />
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      
+      <Dialog open={isAddNewSellerOpen} onOpenChange={handleCLoseSellerMOdel}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <AddSeller isInModel={true} />
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

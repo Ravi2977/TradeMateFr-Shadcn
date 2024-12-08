@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "@/components/ui/Loader";
 
-function AddCustomer() {
+function AddCustomer({isInModel}) {
   const [customerDetails, setCustomerDetails] = useState({
     customerName: "",
     address: "",
@@ -66,7 +66,7 @@ function AddCustomer() {
   };
 
   return (
-    <div className="sm:mx-64">
+    <div className={`${isInModel?"":"sm:mx-64"}`}>
       <h1 className="text-center text-3xl font-bold">Add New Customer</h1>
 
       <form className="space-y-6" onSubmit={handleOnSubmit}>
