@@ -19,20 +19,24 @@ import { Button } from "@/components/ui/button";
 
 const chartConfig = {
   views: {
-    label: "Sales & Profits",
+    label: "Sales, Profits & Remaining",
   },
-  desktop: {
+  sales: {
     label: "Total Sales",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
+  profit: {
     label: "Total Profit",
     color: "hsl(var(--chart-2))",
+  },
+  totalRemaining: {
+    label: "Total Remaining",
+    color: "hsl(var(--chart-5))", // Add color for the new chart
   },
 };
 
 export function LineChartForSalesAndProfits({ chartData }) {
-  const [activeChart, setActiveChart] = useState("desktop");
+  const [activeChart, setActiveChart] = useState("sales");
   const [dateFilter, setDateFilter] = useState("all"); // Default filter is "All Data"
 
   // Get the filtered data based on the date filter
@@ -65,16 +69,18 @@ export function LineChartForSalesAndProfits({ chartData }) {
     () =>
       filteredData.map((entry) => ({
         date: entry.date,
-        desktop: entry.totalSales, // Map totalSales to desktop
-        mobile: entry.totalProfit, // Map totalProfit to mobile
+        sales: entry.totalSales, // Map totalSales to sales
+        profit: entry.totalProfit, // Map totalProfit to profit
+        totalRemaining: entry.totalRemaining, // Map totalRemaining
       })),
     [filteredData]
   );
 
   const total = useMemo(
     () => ({
-      desktop: processedData.reduce((acc, curr) => acc + curr.desktop, 0),
-      mobile: processedData.reduce((acc, curr) => acc + curr.mobile, 0),
+      sales: processedData.reduce((acc, curr) => acc + curr.sales, 0),
+      profit: processedData.reduce((acc, curr) => acc + curr.profit, 0),
+      totalRemaining: processedData.reduce((acc, curr) => acc + curr.totalRemaining, 0),
     }),
     [processedData]
   );
@@ -83,13 +89,13 @@ export function LineChartForSalesAndProfits({ chartData }) {
     <Card>
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Sales and Profits</CardTitle>
+          <CardTitle>Sales, Profits & Remaining</CardTitle>
           <CardDescription>
-            Showing total sales and profits
+            Showing total sales, profits, and remaining values
           </CardDescription>
         </div>
         <div className="flex">
-          {["desktop", "mobile"].map((chart) => (
+          {["sales", "profit", "totalRemaining"].map((chart) => (
             <button
               key={chart}
               data-active={activeChart === chart}

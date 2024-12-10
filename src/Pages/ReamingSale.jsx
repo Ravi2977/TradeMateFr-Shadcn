@@ -78,7 +78,7 @@ function SaleList() {
   const loadSaleDetails = async () => {
     try {
       const saleDetail = await axiosInstance.post(
-        `/sales/allsaledetails`,
+        `/sales/allRemaining`,
         company
       );
       setSalesData(saleDetail.data);
@@ -203,7 +203,7 @@ function SaleList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentSalesData.filter((sale)=>sale.remaining>0).map((sale) => (
+          {currentSalesData.map((sale) => (
             <TableRow
               key={sale.id}
               className={sale.remaining > 0 ? "highlight" : ""}
