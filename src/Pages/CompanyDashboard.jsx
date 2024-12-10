@@ -2,11 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/AuthContext/AuthContext";
 import axiosInstance from "@/components/AxiosInstance";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PencilIcon } from "lucide-react";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { toast } from "react-toastify";
 import { ActiveBarChart } from "@/components/Bar-chart";
+import { AreaChartSales } from "@/components/ui/SalePurchaseChart";
+import { LineChart } from "recharts";
+import { LineChartForSalesAndProfits } from "@/components/LineChart";
 
 function CompanyDashboard() {
   const { changeValue, setChangeValue } = useAuth();
@@ -27,9 +37,42 @@ function CompanyDashboard() {
     fetchCompany();
     fetchProductReport();
     fetchDailySalesReport();
+    fetchDailySalesReportWithProfit()
     fetchCustomerWiseSalesReport();
   }, []);
 
+
+   const [chartDataForArea,setChartDataForArea] =useState([]);
+
+  const chartConfig = {
+    visitors: {
+      label: "Visitors",
+    },
+    totalSales: {
+      label: "totalSales",
+      color: "hsl(var(--chart-1))",
+    },
+    // totalSales: {
+    //   label: "totalSales",
+    //   color: "hsl(var(--chart-2))",
+    // },
+  };
+
+  const [chartDataOfSalesWithProfit,setCHartDataWithProfitOfSales]=useState([])
+
+const chartConfigforSalesProfit = {
+    visitors: {
+      label: "Visitors",
+    },
+    totalSales: {
+      label: "totalSales",
+      color: "hsl(var(--chart-1))",
+    },
+    profit: {
+      label: "totalProfit",
+      color: "hsl(var(--chart-2))",
+    },
+  };
   const fetchCompany = async () => {
     try {
       const response = await axiosInstance.get(
@@ -47,6 +90,7 @@ function CompanyDashboard() {
       `/company/getCompanyProductReport/${localStorage.getItem("companyId")}`
     );
     setChartData(response.data);
+  
   };
 
   const fetchDailySalesReport = async () => {
@@ -54,11 +98,24 @@ function CompanyDashboard() {
       `/company/reports/sales/daily/${localStorage.getItem("companyId")}`
     );
     setDailySalesReport(response.data);
+    setChartDataForArea(response.data)
+    // console.log(response.data)
+  };
+
+  const fetchDailySalesReportWithProfit = async () => {
+    const response = await axiosInstance.get(
+      `/company/reports/sales-profit/daily/${localStorage.getItem("companyId")}`
+    );
+    setDailySalesReport(response.data);
+    setCHartDataWithProfitOfSales(response.data)
+    // console.log(response.data)
   };
 
   const fetchCustomerWiseSalesReport = async () => {
     const response = await axiosInstance.get(
-      `/company/reports/sales/customer-wise/${localStorage.getItem("companyId")}`
+      `/company/reports/sales/customer-wise/${localStorage.getItem(
+        "companyId"
+      )}`
     );
     setCustomerWiseSaleReport(response.data);
   };
@@ -94,6 +151,7 @@ function CompanyDashboard() {
     document.querySelector('input[type="file"]').click();
   };
 
+ 
   if (!company) return <div>Loading...</div>;
 
   return (
@@ -101,9 +159,15 @@ function CompanyDashboard() {
       {/* Company Information Section */}
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4">{company.companyName}</h2>
-        <p><strong>Mobile:</strong> {company.mobile || "N/A"}</p>
-        <p><strong>Bank Name:</strong> {company.bankName || "N/A"}</p>
-        <p><strong>IFSC Code:</strong> {company.ifscCode || "N/A"}</p>
+        <p>
+          <strong>Mobile:</strong> {company.mobile || "N/A"}
+        </p>
+        <p>
+          <strong>Bank Name:</strong> {company.bankName || "N/A"}
+        </p>
+        <p>
+          <strong>IFSC Code:</strong> {company.ifscCode || "N/A"}
+        </p>
         <p>
           <strong>Account Number:</strong>{" "}
           {showAccountNumber ? company.accountNumber || "N/A" : "*************"}
@@ -119,91 +183,97 @@ function CompanyDashboard() {
           alt="Company Sign and Stamp"
           className="mb-4 w-32 h-32 object-cover"
         />
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogTrigger asChild>
-          <Button onClick={handleEdit}>Edit</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Update Company Details</DialogTitle>
-            <DialogDescription>
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  className="border p-1 w-full"
-                  placeholder="Account Number"
-                  value={companyNewInfo.accountNumber || ""}
-                  onChange={(e) =>
-                    setCompanyNewInfo({
-                      ...companyNewInfo,
-                      accountNumber: e.target.value,
-                    })
-                  }
-                />
-                <input
-                  type="text"
-                  className="border p-1 w-full"
-                  placeholder="Bank Name"
-                  value={companyNewInfo.bankName || ""}
-                  onChange={(e) =>
-                    setCompanyNewInfo({
-                      ...companyNewInfo,
-                      bankName: e.target.value,
-                    })
-                  }
-                />
-                <input
-                  type="text"
-                  className="border p-1 w-full"
-                  placeholder="IFSC Code"
-                  value={companyNewInfo.ifscCode || ""}
-                  onChange={(e) =>
-                    setCompanyNewInfo({
-                      ...companyNewInfo,
-                      ifscCode: e.target.value,
-                    })
-                  }
-                />
-                <Label>Upload Image of your sign with Stamp</Label>
-                <div className="relative mb-4">
+        <Dialog open={isEditing} onOpenChange={setIsEditing}>
+          <DialogTrigger asChild>
+            <Button onClick={handleEdit}>Edit</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Update Company Details</DialogTitle>
+              <DialogDescription>
+                <div className="space-y-2">
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
+                    type="text"
+                    className="border p-1 w-full"
+                    placeholder="Account Number"
+                    value={companyNewInfo.accountNumber || ""}
+                    onChange={(e) =>
+                      setCompanyNewInfo({
+                        ...companyNewInfo,
+                        accountNumber: e.target.value,
+                      })
+                    }
                   />
-                  <div className="border border-gray-300 w-32 h-32 rounded-md flex items-center justify-center relative">
-                    {base64Image ? (
-                      <img
-                        src={base64Image}
-                        alt="Uploaded Preview"
-                        className="object-cover w-full h-full rounded-md"
-                      />
-                    ) : (
-                      <span className="text-gray-400">No Image Selected</span>
-                    )}
-                    <PencilIcon
-                      onClick={handlePenClick}
-                      className="absolute bottom-2 right-2 h-6 w-6 text-gray-600 cursor-pointer"
+                  <input
+                    type="text"
+                    className="border p-1 w-full"
+                    placeholder="Bank Name"
+                    value={companyNewInfo.bankName || ""}
+                    onChange={(e) =>
+                      setCompanyNewInfo({
+                        ...companyNewInfo,
+                        bankName: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="border p-1 w-full"
+                    placeholder="IFSC Code"
+                    value={companyNewInfo.ifscCode || ""}
+                    onChange={(e) =>
+                      setCompanyNewInfo({
+                        ...companyNewInfo,
+                        ifscCode: e.target.value,
+                      })
+                    }
+                  />
+                  <Label>Upload Image of your sign with Stamp</Label>
+                  <div className="relative mb-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
                     />
+                    <div className="border border-gray-300 w-32 h-32 rounded-md flex items-center justify-center relative">
+                      {base64Image ? (
+                        <img
+                          src={base64Image}
+                          alt="Uploaded Preview"
+                          className="object-cover w-full h-full rounded-md"
+                        />
+                      ) : (
+                        <span className="text-gray-400">No Image Selected</span>
+                      )}
+                      <PencilIcon
+                        onClick={handlePenClick}
+                        className="absolute bottom-2 right-2 h-6 w-6 text-gray-600 cursor-pointer"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-4">
-                <Button onClick={handleSave}>Save</Button>
-                <Button onClick={() => setIsEditing(false)} className="ml-2">
-                  Cancel
-                </Button>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+                <div className="mt-4">
+                  <Button onClick={handleSave}>Save</Button>
+                  <Button onClick={() => setIsEditing(false)} className="ml-2">
+                    Cancel
+                  </Button>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Chart Section */}
 
-        <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <AreaChartSales
+          chartData={chartDataOfSalesWithProfit}
+          chartConfig={chartConfigforSalesProfit}
+        />
+        </div>
+        <LineChartForSalesAndProfits chartData={chartDataOfSalesWithProfit}/>
         <ActiveBarChart
           chartData={chartData}
           chartTitle="Sales & Purchases"
@@ -216,36 +286,35 @@ function CompanyDashboard() {
             barRadius: [10, 10, 0, 0],
           }}
         />
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <ActiveBarChart
-            chartData={dailySalesReport}
-            chartTitle="Daily Sales Report"
-            xAxisKey="date"
-            barKeys={["totalSales"]}
-            barColors={["hsl(var(--chart-2))"]}
-            chartConfig={{
-              width: 600,
-              height: 200,
-              barRadius: [10, 10, 0, 0],
-            }}
-          />
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <ActiveBarChart
-            chartData={customerWiseSaleReport}
-            chartTitle="Customer-wise Sales Report"
-            xAxisKey="customerName"
-            barKeys={["totalSpent"]}
-            barColors={["hsl(var(--chart-2))"]}
-            chartConfig={{
-              width: 600,
-              height: 200,
-              barRadius: [10, 10, 0, 0],
-            }}
-          />
-        </div>
-    
+  
+      {/* <div className="bg-white shadow-md rounded-lg p-6">
+        <ActiveBarChart
+          chartData={dailySalesReport}
+          chartTitle="Daily Sales Report"
+          xAxisKey="date"
+          barKeys={["totalSales"]}
+          barColors={["hsl(var(--chart-2))"]}
+          chartConfig={{
+            width: 600,
+            height: 200,
+            barRadius: [10, 10, 0, 0],
+          }}
+        />
+      </div> */}
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <ActiveBarChart
+          chartData={customerWiseSaleReport}
+          chartTitle="Customer-wise Sales Report"
+          xAxisKey="customerName"
+          barKeys={["totalSpent"]}
+          barColors={["hsl(var(--chart-2))"]}
+          chartConfig={{
+            width: 600,
+            height: 200,
+            barRadius: [10, 10, 0, 0],
+          }}
+        />
+      </div>
     </div>
   );
 }
