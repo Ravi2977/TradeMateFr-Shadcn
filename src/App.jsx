@@ -22,6 +22,7 @@ import AddSeller from "./Pages/AddSeller";
 import SellerList from "./Pages/SellerList";
 import AddPurchase from "./Pages/AddPurchase";
 import PurchaseList from "./Pages/PurchaseList";
+import TopNavBar from "./components/TopNavBar";
 
 function App() {
   const isAuthenticated = localStorage.getItem("login");
@@ -33,7 +34,7 @@ function App() {
         <SidebarProvider>
           <AppSidebar />
           <main className="flex-grow p-2">
-            <SidebarTrigger />
+            <TopNavBar/>
             <Routes>
               {/* <Route path="/" element={localStorage.getItem("login")?<UserDashboard />:<Signin/>} /> */}
               <Route path="/dashboard" element={<UserDashboard />}></Route>

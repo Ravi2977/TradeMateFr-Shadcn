@@ -17,10 +17,13 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [changeValue, setChangeValue] = useState(1); // Moved here
+  const [isPaymentOpen, setIsPaymentOppen] = useState(true);
   const value = {
     auth,
     changeValue, // Added changeValue to the context
     setChangeValue, // Added setChangeValue to the context
+    isPaymentOpen,
+    setIsPaymentOppen
   };
 
   return (

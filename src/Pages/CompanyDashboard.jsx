@@ -17,6 +17,7 @@ import { ActiveBarChart } from "@/components/Bar-chart";
 import { AreaChartSales } from "@/components/ui/SalePurchaseChart";
 import { LineChart } from "recharts";
 import { LineChartForSalesAndProfits } from "@/components/LineChart";
+import ReportOFProductAndCustomer from "@/components/ReportOFProductAndCustomer";
 
 function CompanyDashboard() {
   const { changeValue, setChangeValue } = useAuth();
@@ -71,6 +72,10 @@ const chartConfigforSalesProfit = {
     profit: {
       label: "totalProfit",
       color: "hsl(var(--chart-2))",
+    },
+    remainig: {
+      label: "totalProfit",
+      color: "hsl(var(--chart-3))",
     },
   };
   const fetchCompany = async () => {
@@ -153,6 +158,24 @@ const chartConfigforSalesProfit = {
 
  
   if (!company) return <div>Loading...</div>;
+
+//   Usage example
+// Pass `topProducts` and `topCustomers` as props when rendering the component.
+const topProducts = [
+  { id: 1, name: 'Product A', quantity: 100 },
+  { id: 2, name: 'Product B', quantity: 90 },
+  { id: 3, name: 'Product C', quantity: 80 },
+  { id: 4, name: 'Product D', quantity: 70 },
+  { id: 5, name: 'Product E', quantity: 60 },
+];
+
+const topCustomers = [
+  { id: 1, name: 'Customer X', totalPurchases: 1000 },
+  { id: 2, name: 'Customer Y', totalPurchases: 900 },
+  { id: 3, name: 'Customer Z', totalPurchases: 800 },
+  { id: 4, name: 'Customer W', totalPurchases: 700 },
+  { id: 5, name: 'Customer V', totalPurchases: 600 },
+];
 
   return (
     <div className="p-4 space-y-6">
@@ -264,6 +287,7 @@ const chartConfigforSalesProfit = {
           </DialogContent>
         </Dialog>
       </div>
+      <ReportOFProductAndCustomer topProducts={topProducts} topCustomers={topCustomers}/>
 
       {/* Chart Section */}
 
