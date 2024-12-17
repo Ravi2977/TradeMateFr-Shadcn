@@ -131,6 +131,14 @@ export function AreaChartSales({ chartConfig, chartData }) {
               strokeWidth={2}
               stackId="a"
             />
+            <Area
+              dataKey="totalRemaining"
+              type="natural"
+              fill="url(#fillTotalSales)"
+              stroke="#009061"
+              strokeWidth={2}
+              stackId="a"
+            />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
