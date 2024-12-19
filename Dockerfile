@@ -1,28 +1,23 @@
-# FROM node:20.16-alpine
-
-# WORKDIR /react-app
-
-# EXPOSE 3000
-
-# COPY package.json package-lock.json ./
-
-# RUN npm install --silent
-
-# COPY . ./
-
-# CMD ["npm", "run", "dev"]
-
-
 FROM node:18-alpine
 
-WORKDIR /react-vite-app
+# Set the working directory
+WORKDIR /react-app
 
-EXPOSE 3000
-
+# Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
 
+# Install dependencies
 RUN npm install --silent
 
-COPY . ./
+# Copy the rest of your application files
+COPY . .
 
+# Build the application for production
+RUN npm run build
+
+# Expose port 3000 (default for Vite)
+EXPOSE 3000
+
+# Command to run the application
 CMD ["npm", "run", "dev"]
+
