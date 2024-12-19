@@ -10,6 +10,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0', // Listen on all interfaces
     port: 3000, // Set the port to 3000
   },
 });
