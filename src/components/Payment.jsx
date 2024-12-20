@@ -64,7 +64,7 @@ function Payment() {
     e.preventDefault();
     setIsPaymentOppen(false);
     axios
-      .post(`http://localhost:8080/auth/create_order`, {
+      .post(`https://backend.ravicomputer.online/auth/create_order`, {
         amount: netPayableAmount,
         info: "Order_request",
         email: JSON.parse(localStorage.getItem("login")).userNAme,
