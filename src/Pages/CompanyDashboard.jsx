@@ -26,6 +26,7 @@ function CompanyDashboard() {
   const [dailySalesReport, setDailySalesReport] = useState([]);
   const [customerWiseSaleReport, setCustomerWiseSaleReport] = useState([]);
   const [chartData, setChartData] = useState([]);
+  
 
   const [companyNewInfo, setCompanyNewInfo] = useState({
     companyId: localStorage.getItem("companyId"),
@@ -85,6 +86,7 @@ const chartConfigforSalesProfit = {
       );
       setCompany(response.data);
       setCompanyNewInfo(response.data);
+      localStorage.setItem("companyDetials",JSON.stringify(response.data))
     } catch (error) {
       console.error("Error fetching company data:", error);
     }

@@ -32,7 +32,7 @@ import { useAuth } from "@/AuthContext/AuthContext";
 
 function TopNavBar() {
   const email = JSON.parse(localStorage.getItem("login"))?.userNAme;
-  const {isPaymentOpen, setIsPaymentOppen} = useAuth()
+  const { isPaymentOpen, setIsPaymentOppen } = useAuth();
   const [userData, setUserData] = useState(null);
   const [isExpired, setIsExpired] = useState(false);
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
@@ -59,7 +59,7 @@ function TopNavBar() {
 
   useEffect(() => {
     fetchUser();
-  }, [email,isPaymentOpen]);
+  }, [email, isPaymentOpen]);
 
   const handlePurchaseSubscription = () => {
     // Navigate to the subscription purchase page or handle logic here
@@ -67,7 +67,10 @@ function TopNavBar() {
   };
 
   const openPayment = () => {
+    setIsExpired(true)
     setIsPaymentOppen(true);
+
+    
   };
 
   const closePaymen = () => {
@@ -112,16 +115,15 @@ function TopNavBar() {
       </AlertDialog>
 
       <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOppen}>
-  <DialogContent className="w-full max-w-6xl h-[90vh] overflow-y-auto">
-    <DialogHeader>
-      <DialogTitle>Pricing</DialogTitle>
-      <DialogDescription>
-        <Payment />
-      </DialogDescription>
-    </DialogHeader>
-  </DialogContent>
-</Dialog>
-
+        <DialogContent className="w-full max-w-6xl h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Pricing</DialogTitle>
+            <DialogDescription>
+              <Payment />
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
