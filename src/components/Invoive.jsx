@@ -14,6 +14,10 @@ import {
 
 const Invoice = ({ saleId }) => {
   const [invoiceData, setInvoiceData] = useState(null);
+  const [company, setCompany] = useState(
+    JSON.parse(localStorage.getItem("companyDetials"))
+  );
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,10 +38,10 @@ const Invoice = ({ saleId }) => {
   const handlePrint = () => {
     const invoiceElement = document.getElementById("invoice");
     const options = {
-      margin: 0.5,
-      filename: `${customerModel.customerName}-Invoice.pdf`,
+      margin: [0.2, 0.2, 0.2, 0.2], // Reduced margins
+      filename: `${invoiceData?.customerModel?.customerName}-Invoice.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
 
@@ -51,21 +55,19 @@ const Invoice = ({ saleId }) => {
 
   return (
     <div>
-    
-
       <div
         id="invoice"
-        className="p-4 bg-white shadow-md rounded-lg max-w-2xl mx-auto "
+        className="p-2 bg-white shadow-md rounded-lg max-w-2xl mx-auto text-xs" // Smaller text size
       >
         {/* Invoice Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">Invoice</h1>
-          <p className="text-sm text-gray-500">Invoice #TD{+sales[0]?.id}</p>
+        <div className="text-center mb-4">
+          <h1 className="text-lg font-bold">Invoice</h1>
+          <p className="text-xs text-gray-500">Invoice #TD{+sales[0]?.id}</p>
         </div>
 
         {/* Bill To Section */}
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Bill To:</h2>
+        <div className="mb-2">
+          <h2 className="font-semibold">Bill To:</h2>
           <p>{customerModel.customerName}</p>
           <p>
             {customerModel.address}, {customerModel.state},{" "}
@@ -77,53 +79,50 @@ const Invoice = ({ saleId }) => {
         </div>
 
         {/* Company Information */}
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Bill From:</h2>
-          <p>{customerModel.company.companyName}</p>
+        <div className="mb-2">
+          <h2 className="font-semibold">Bill From:</h2>
+          <p>{company.companyName}</p>
           <p>
-            {customerModel.company.companyAddress},{" "}
-            {customerModel.company.district}, {customerModel.company.state}
+            {company.companyAddress}, {company.district}, {company.state}
           </p>
           <p>
-            {customerModel.company.country} - {customerModel.company.pinCode}
+            {company.country} - {company.pinCode}
           </p>
-          <p>Mobile: {customerModel.company.mobile}</p>
+          <p>Mobile: {company.mobile}</p>
 
           {/* Highlighted Account Details */}
-          <div className="bg-yellow-100 p-4 rounded-md mt-4">
-            <h2 className="text-lg font-semibold mb-2">Account Details</h2>
+          <div className="bg-yellow-50 p-2 rounded-md mt-2 text-xs">
+            <h2 className="font-semibold mb-1">Account Details</h2>
             <table className="w-full text-left">
               <tbody>
                 <tr>
-                  <td className="font-semibold py-1 pr-4">Bank:</td>
-                  <td>{customerModel.company.bankName}</td>
+                  <td className="font-semibold py-1 pr-2">Bank:</td>
+                  <td>{company.bankName}</td>
                 </tr>
                 <tr>
-                  <td className="font-semibold py-1 pr-4">
+                  <td className="font-semibold py-1 pr-2">
                     Account Holder Name:
                   </td>
-                  <td>{customerModel.company.companyName}</td>
+                  <td>{company.companyName}</td>
                 </tr>
                 <tr>
-                  <td className="font-semibold py-1 pr-4">Account Number:</td>
-                  <td>{customerModel.company.accountNumber}</td>
+                  <td className="font-semibold py-1 pr-2">Account Number:</td>
+                  <td>{company.accountNumber}</td>
                 </tr>
                 <tr>
-                  <td className="font-semibold py-1 pr-4">IFSC Code:</td>
-                  <td>{customerModel.company.ifscCode}</td>
+                  <td className="font-semibold py-1 pr-2">IFSC Code:</td>
+                  <td>{company.ifscCode}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           {/* Conditional GST Information */}
-          {customerModel.company.gstIn && (
-            <p className="mt-2">GSTIN: {customerModel.company.gstIn}</p>
-          )}
+          {company.gstIn && <p className="mt-2">GSTIN: {company.gstIn}</p>}
         </div>
 
         {/* Sales Items Table */}
-        <Table className="mb-4">
+        <Table className="mb-4 text-xs">
           <TableHeader>
             <TableRow>
               <TableCell className="font-semibold">Item</TableCell>
@@ -151,12 +150,12 @@ const Invoice = ({ saleId }) => {
         </div>
 
         {/* Signature and Stamp Section */}
-        <div className="flex justify-between items-center mt-6">
+        <div className="flex justify-between items-center mt-4">
           <div className="flex flex-col items-center">
             <p className="font-semibold">Authorized Signature & Stamp</p>
-            <div className="w-36 h-32 border border-gray-300 mt-2">
+            <div className="w-24 h-20 border border-gray-300 mt-3">
               <img
-                src={customerModel.company.image}
+                src={company.image}
                 alt="Signature & Stamp"
                 className="w-full h-full object-contain"
               />
@@ -164,11 +163,11 @@ const Invoice = ({ saleId }) => {
           </div>
         </div>
 
-        {/* Terms and Conditions - Bottom of Invoice */}
-        <div className="mt-6 border-t border-gray-200 pt-4">
-          <h2 className="text-lg font-semibold">Terms & Conditions</h2>
-          <ul className="text-sm text-gray-600 list-disc ml-4 mt-2">
-            <li>Goods once sold Will not be returned or Refunded.</li>
+        {/* Terms and Conditions */}
+        <div className="mt-4 border-t border-gray-200 pt-2 text-xs">
+          <h2 className="font-semibold">Terms & Conditions</h2>
+          <ul className="list-disc ml-4">
+            <li>Goods once sold will not be returned or refunded.</li>
             <li>All taxes are applicable as per government regulations.</li>
             <li>
               For any queries regarding this invoice, please contact us at
@@ -177,7 +176,7 @@ const Invoice = ({ saleId }) => {
           </ul>
         </div>
       </div>
-      <Button className="w-full mt-4" onClick={handlePrint}>
+      <Button className="w-full mt-2" onClick={handlePrint}>
         Print Invoice
       </Button>
     </div>
