@@ -13,17 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // ShadCN Alert components
 import axiosInstance from "./AxiosInstance";
@@ -37,6 +27,7 @@ function TopNavBar() {
   const [isExpired, setIsExpired] = useState(false);
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
+  const {paymentTracking,setPaymentTracking}=useAuth()
 
   const fetchUser = async () => {
     const response = await axiosInstance.get(`/user/byemail/${email}`);
@@ -59,7 +50,7 @@ function TopNavBar() {
 
   useEffect(() => {
     fetchUser();
-  }, [email, isPaymentOpen]);
+  }, [email, isPaymentOpen,paymentTracking]);
 
   const handlePurchaseSubscription = () => {
     // Navigate to the subscription purchase page or handle logic here
@@ -67,10 +58,7 @@ function TopNavBar() {
   };
 
   const openPayment = () => {
-    setIsExpired(true)
     setIsPaymentOppen(true);
-
-    
   };
 
   const closePaymen = () => {
@@ -94,25 +82,23 @@ function TopNavBar() {
           </AlertDescription>
         </Alert>
       )}
-
-      {/* Open the AlertDialog if subscription expired */}
-      <AlertDialog open={isExpired} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Subscription Expired</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your subscription has expired. Would you like to purchase a new
-              subscription to continue enjoying our service?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
-            <AlertDialogAction onClick={openPayment}>
-              Purchase Subscription
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Open the Dialog if subscription expired */}
+      {isExpired && (
+        <>
+          {/* Full-Screen Overlay */}
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+            {/* Prevent interaction with the background */}
+            <div className="h-full w-full flex items-center justify-center pointer-events-none">
+              {/* Payment section will be centered and still clickable */}
+              <div className="pointer-events-auto bg-white p-8 rounded-md shadow-lg">
+                <h3>Your subscription has expired!</h3>
+                <p>Please renew it soon to continue enjoying the service.</p>
+                <Button onClick={openPayment}>See Pricing</Button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOppen}>
         <DialogContent className="w-full max-w-6xl h-[90vh] overflow-y-auto">
