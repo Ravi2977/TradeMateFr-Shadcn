@@ -18,6 +18,8 @@ function Payment() {
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const { isPaymentOpen, setIsPaymentOppen } = useAuth();
+  const {paymentTracking,setPaymentTracking}=useAuth()
+
 
   const plans = {
     basic: {
@@ -62,7 +64,7 @@ function Payment() {
     e.preventDefault();
     setIsPaymentOppen(false);
     axios
-      .post(`https://backend.ravicomputer.online/auth/create_order`, {
+      .post(`http://localhost:8080/auth/create_order`, {
         amount: netPayableAmount,
         info: "Order_request",
         email: JSON.parse(localStorage.getItem("login")).userNAme,
@@ -113,6 +115,7 @@ function Payment() {
 
               });
               alert("Payment succesfull !!");
+              setPaymentTracking((prev)=>prev+1)
             },
             prefill: {
               name: "",
