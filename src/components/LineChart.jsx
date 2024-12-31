@@ -48,8 +48,16 @@ export function LineChartForSalesAndProfits({ chartData }) {
       today: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
       yesterday: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1),
       last7days: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7),
-      last30days: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30),
-      last90days: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90),
+      last30days: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - 30
+      ),
+      last90days: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - 90
+      ),
     }[dateFilter];
 
     // Special handling for "yesterday" to filter only that specific day
@@ -57,7 +65,9 @@ export function LineChartForSalesAndProfits({ chartData }) {
       const endOfYesterday = new Date(startDate);
       endOfYesterday.setHours(23, 59, 59, 999);
       return chartData.filter(
-        (entry) => new Date(entry.date) >= startDate && new Date(entry.date) <= endOfYesterday
+        (entry) =>
+          new Date(entry.date) >= startDate &&
+          new Date(entry.date) <= endOfYesterday
       );
     }
 
@@ -80,7 +90,10 @@ export function LineChartForSalesAndProfits({ chartData }) {
     () => ({
       sales: processedData.reduce((acc, curr) => acc + curr.sales, 0),
       profit: processedData.reduce((acc, curr) => acc + curr.profit, 0),
-      totalRemaining: processedData.reduce((acc, curr) => acc + curr.totalRemaining, 0),
+      totalRemaining: processedData.reduce(
+        (acc, curr) => acc + curr.totalRemaining,
+        0
+      ),
     }),
     [processedData]
   );
@@ -105,8 +118,9 @@ export function LineChartForSalesAndProfits({ chartData }) {
               <span className="text-xs text-muted-foreground">
                 {chartConfig[chart].label}
               </span>
+              INR
               <span className="text-lg font-bold leading-none sm:text-3xl">
-                {total[chart].toLocaleString()}
+               {total[chart].toLocaleString()}
               </span>
             </button>
           ))}
@@ -114,7 +128,14 @@ export function LineChartForSalesAndProfits({ chartData }) {
       </CardHeader>
       <CardContent className="px-2 sm:p-6">
         <div className="mb-4 flex gap-4 flex-wrap">
-          {["all", "today", "yesterday", "last7days", "last30days", "last90days"].map((filter) => (
+          {[
+            "all",
+            "today",
+            "yesterday",
+            "last7days",
+            "last30days",
+            "last90days",
+          ].map((filter) => (
             <Button
               key={filter}
               variant={dateFilter === filter ? "default" : "outline"}
@@ -165,7 +186,17 @@ export function LineChartForSalesAndProfits({ chartData }) {
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
-                  nameKey="views"
+                  nameKey={activeChart} // Dynamically set the key based on activeChart
+                  formatter={(value, name) => {
+                    if (name === activeChart) {
+                      return [
+                        `INR ${value.toLocaleString()} : ${
+                          chartConfig[activeChart].label
+                        }`, // Add INR before the value with separator and label
+                      ];
+                    }
+                    return null; // Skip other data
+                  }}
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
@@ -176,6 +207,7 @@ export function LineChartForSalesAndProfits({ chartData }) {
                 />
               }
             />
+
             <Line
               dataKey={activeChart}
               type="monotone"

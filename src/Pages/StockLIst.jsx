@@ -1,5 +1,5 @@
-import axiosInstance from "@/components/AxiosInstance";
 import React, { useEffect, useState } from "react";
+import axiosInstance from "@/components/AxiosInstance";
 import {
   Table,
   TableBody,
@@ -35,7 +35,7 @@ function StockList() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Tracks rows per page
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [productName, setProdcutName] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -66,6 +66,11 @@ function StockList() {
     setCurrentPage(1);
   };
 
+  const handleRowsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page on rows change
+  };
+
   const filteredStocks = stocks.filter((stock) =>
     stock.itemName.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -94,13 +99,13 @@ function StockList() {
       await axiosInstance.put(`/stock/updateStock`, {
         purchasePrice: productNewPrice,
         itemId: selectedProductId,
-        itemName:productName
+        itemName: productName,
       });
       setIsDialogOpen(false);
       toast.success("New Price Updated");
       fetchStocks(); // Refresh the stock list
     } catch (error) {
-      toast.error("Some Error Occures ");
+      toast.error("Some Error Occurred");
     }
   };
 
@@ -111,50 +116,35 @@ function StockList() {
     <div className="overflow-x-auto sm:w-full w-screen">
       <h2 className="text-xl font-semibold mb-4">Stock List</h2>
 
-      <input
-        type="text"
-        placeholder="Search by item name..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        className="mb-4 p-2 border border-gray-300 rounded"
-      />
+      <div className="flex justify-between mb-4">
+        <input
+          type="text"
+          placeholder="Search by item name..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="p-2 border border-gray-300 rounded"
+        />
+        <select
+          value={itemsPerPage}
+          onChange={handleRowsPerPageChange}
+          className="p-2 border border-gray-300 rounded"
+        >
+          <option value="5">5 rows per page</option>
+          <option value="10">10 rows per page</option>
+          <option value="20">20 rows per page</option>
+          <option value="50">50 rows per page</option>
+        </select>
+      </div>
+
+      {/* Dialog Component */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-200">
+        <DialogContent className="max-w-md mx-auto p-6 rounded-lg shadow-lg border border-gray-200">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-gray-800 mb-2">
               Update New Price
             </DialogTitle>
             <DialogDescription className="text-gray-600 mb-4">
-              <div className="flex flex-col gap-2 text-gray-700">
-                <div className="text-lg font-medium">
-                  <span>Item Name:</span>{" "}
-                  <span className="text-gray-600">{productName}</span>
-                </div>
-                <div className="text-lg font-medium">
-                  <span>Previous Price:</span>{" "}
-                  <span className="text-gray-600">Rs. {productPrice}</span>
-                </div>
-              </div>
-              <Label className="block text-gray-700 font-semibold mt-4">
-                Enter New Name if chnaged
-              </Label>
-              <Input
-                value={productName}
-                onChange={(e) => setProdcutName(e.target.value)}
-                type="text"
-                placeholder="New Price"
-                className="mt-2 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <Label className="block text-gray-700 font-semibold mt-4">
-                Enter New Price
-              </Label>
-              <Input
-                value={productNewPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
-                type="number"
-                placeholder="New Price"
-                className="mt-2 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              {/* Dialog Content */}
             </DialogDescription>
             <Button
               onClick={updatePrice}
@@ -166,10 +156,10 @@ function StockList() {
         </DialogContent>
       </Dialog>
 
-      <Table className="min-w-full bg-white shadow-md rounded-lg">
+      {/* Table Component */}
+      <Table className="min-w-full shadow-md rounded-lg">
         <TableHeader>
-          <TableRow>
-            <TableHead className="px-4 py-2 text-center">S.No.</TableHead>
+        <TableHead className="px-4 py-2 text-center">S.No.</TableHead>
             <TableHead className="px-4 py-2 text-center">Name</TableHead>
             <TableHead className="px-4 py-2 text-center">Category</TableHead>
             <TableHead className="px-4 py-2 text-center">Quantity</TableHead>
@@ -178,12 +168,11 @@ function StockList() {
             </TableHead>
             <TableHead className="px-4 py-2 text-center">SKU</TableHead>
             <TableHead className="px-4 py-2 text-center">Action</TableHead>
-          </TableRow>
         </TableHeader>
         <TableBody>
-          {displayedStocks.slice().reverse().map((stock, index) => (
-            <TableRow key={stock.itemId} className={`${stock.quantity<5 &&"highlight"}`}>
-              <TableCell className="px-4 py-2 text-center">
+          {displayedStocks.map((stock, index) => (
+            <TableRow key={stock.itemId}>
+             <TableCell className="px-4 py-2 text-center">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </TableCell>
               <TableCell className="px-4 py-2 text-center">
@@ -213,32 +202,43 @@ function StockList() {
       </Table>
 
       <div className="mt-4">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => handlePageChange(currentPage - 1)}
-              />
-            </PaginationItem>
-            {[...Array(totalPages).keys()].map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  href="#"
-                  onClick={() => handlePageChange(page + 1)}
-                  active={page + 1 === currentPage}
-                >
-                  {page + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => handlePageChange(currentPage + 1)}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+  <Pagination>
+    <PaginationContent className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
+      <PaginationItem>
+        <PaginationPrevious
+          onClick={() => handlePageChange(currentPage - 1)}
+          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
+        />
+      </PaginationItem>
+
+      {/* Dynamically generate page numbers */}
+      {[...Array(totalPages).keys()].map((page) => (
+        <PaginationItem key={page}>
+          <PaginationLink
+            href="#"
+            onClick={() => handlePageChange(page + 1)}
+            active={page + 1 === currentPage}
+            className={`px-4 py-2 text-gray-700 rounded-md cursor-pointer ${
+              page + 1 === currentPage
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            {page + 1}
+          </PaginationLink>
+        </PaginationItem>
+      ))}
+
+      <PaginationItem>
+        <PaginationNext
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
+        />
+      </PaginationItem>
+    </PaginationContent>
+  </Pagination>
+</div>
+
     </div>
   );
 }

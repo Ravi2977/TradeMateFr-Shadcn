@@ -74,7 +74,7 @@ function PurchaseList() {
   const loadPurchaseDetails = async () => {
     try {
       const purchaseDetail = await axiosInstance.get(`/purchase/getbycompany/${company.companyId}`, company);
-      setPurchasesData(purchaseDetail.data);
+      setPurchasesData(purchaseDetail.data.slice().reverse());
     } catch (error) {
       console.error("Error loading purchase details:", error);
     }
@@ -170,7 +170,7 @@ function PurchaseList() {
         onChange={handleSearchChange}
         className="mb-4 p-2 border border-gray-300 rounded"
       />
-      <div className="bg-white shadow-md rounded-lg overflow-x-auto sm:w-full w-screen">
+      <div className=" shadow-md rounded-lg overflow-x-auto sm:w-full w-screen">
         <Table className="min-w-full">
           <TableHeader>
             <TableRow>

@@ -222,10 +222,10 @@ function AddSale() {
   };
 
   return (
-    <div className="p-3">
+    <div className="">
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <h1 className="text-center text-3xl font-bold mb-3">Add New Sale</h1>
-      <div className="flex justify-between px-10">
+      <div className="flex justify-between px-10  py-1">
         <Input
           className="w-96"
           placeholder="Search Customer By Name"
@@ -241,7 +241,7 @@ function AddSale() {
           </Button>
         </div>
       </div>
-      <div className="flex justify-start flex-wrap">
+      <div className="flex justify-start flex-wrap sm:h-[35rem] overflow-y-auto">
         {customers
           .filter((customer) =>
             customer.customerName
@@ -249,7 +249,7 @@ function AddSale() {
               .includes(searchCustomer.toLowerCase())
           )
           .map((customer) => (
-            <Card className="w-[250px] m-3">
+            <Card className="w-[250px] m-3 h-[150px]">
               <CardHeader>
                 <CardTitle>
                   <div className="flex justify-between">

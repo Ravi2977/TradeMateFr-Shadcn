@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import Invoice from "@/components/Invoive";
+import { Select } from "@/components/ui/select";
 
 // Helper function to format the date
 const formatDate = (dateString) => {
@@ -52,11 +53,12 @@ function SaleList() {
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10; // Number of items per page
+  const [pageSize, setPageSize] = useState(20); // Number of items per page
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSaleId, setSelectedSaleId] = useState(0);
   const [totalAmountOfSelectedSale, setTotalAmountOfSelectedSale] = useState(0);
-  const [receivedAmountOfSelectedSale, setReceivedAmountOfSelectedSale]=useState(0);
+  const [receivedAmountOfSelectedSale, setReceivedAmountOfSelectedSale] =
+    useState(0);
   const [remainingOfSelected, setRemainingOfSelected] = useState(0);
   const [customerName, setCustomerName] = useState("");
   const [amount, setAmount] = useState("");
@@ -72,7 +74,7 @@ function SaleList() {
   useEffect(() => {
     // Update total pages whenever filtered data changes
     setTotalPages(Math.ceil(filteredSalesData.length / pageSize));
-  }, [salesData, searchTerm]);
+  }, [salesData, searchTerm, pageSize]);
 
   const loadSaleDetails = async () => {
     try {
@@ -111,6 +113,10 @@ function SaleList() {
     startIndex + pageSize
   );
 
+  const handleItemsPerPageChange = (event) => {
+    setPageSize(Number(event.target.value)); // Update items per page
+    setCurrentPage(1); // Reset to first page when items per page changes
+  };
   const handlePageChange = (page) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
@@ -169,39 +175,57 @@ function SaleList() {
     receivedAmount,
     remaining
   ) => {
-    if(remaining===0){
-
+    if (remaining === 0) {
       Swal.fire({
         title: "No Remaining",
         text: `Customer have Paid Complete Amount`,
         icon: "warning",
         // showCancelButton: true,
         confirmButtonText: "OK",
-      })
-    }else{
+      });
+    } else {
       setIsDialogOpen(true);
-    setSelectedSaleId(saleId);
-    setRemainingOfSelected(remaining);
-    setTotalAmountOfSelectedSale(totalAmount);
-    setCustomerName(customerName);
-    setReceivedAmountOfSelectedSale(receivedAmount);
+      setSelectedSaleId(saleId);
+      setRemainingOfSelected(remaining);
+      setTotalAmountOfSelectedSale(totalAmount);
+      setCustomerName(customerName);
+      setReceivedAmountOfSelectedSale(receivedAmount);
     }
   };
 
   return (
     <div className="">
-      <input
-        type="text"
-        placeholder="Search by customer..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        className="mb-4 p-2 border border-gray-300 rounded"
-      />
-      <div className="bg-white shadow-md rounded-lg w-full overflow-x-auto">
+      <div className="flex justify-between px-10">
+        <input
+          type="text"
+          placeholder="Search by customer..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="mb-4 p-2 border border-gray-300 rounded"
+        />
+        <div>
+          <label className="mr-3 sm:flex hidden">Select Items per page</label>
+          <select
+            id="itemsPerPage"
+            value={pageSize}
+            onChange={handleItemsPerPageChange}
+            className="border border-gray-300 p-2 rounded"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+      </div>
+      <div className=" shadow-md rounded-lg w-full overflow-x-auto">
         <div className="overflow-x-auto sm:w-full w-screen">
           <Table className="min-w-full">
             <TableHeader>
               <TableRow>
+                <TableHead className="px-4 py-2">S.No.</TableHead>
+
                 <TableHead className="px-4 py-2">Sale Date</TableHead>
                 <TableHead className="px-4 py-2">Customer Name</TableHead>
                 <TableHead className="px-4 py-2">Item Name</TableHead>
@@ -216,11 +240,14 @@ function SaleList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {currentSalesData.map((sale) => (
+              {currentSalesData.map((sale, index) => (
                 <TableRow
                   key={sale.id}
                   className={sale.remaining > 0 ? "highlight" : ""}
                 >
+                  <TableCell className="px-4 py-2 border-b text-center">
+                    {(currentPage - 1) * pageSize + (index + 1)}
+                  </TableCell>
                   <TableCell className="px-4 py-2 border-b text-center">
                     {formatDate(sale.date)}
                   </TableCell>
@@ -268,7 +295,7 @@ function SaleList() {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <button 
+                          <button
                             className="text-white px-1 py-1 rounded"
                             onClick={() =>
                               openDialog(
@@ -329,39 +356,101 @@ function SaleList() {
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 overflow-x-auto flex w-80 sm:w-auto ml-10 pl-10">
         <Pagination>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
+                className={` ${
+                  currentPage === 1 ? "" : "hover:bg-blue-500"
+                }  cursor-pointer`}
                 onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1} // Disable previous button on first page
               />
             </PaginationItem>
-            {[...Array(totalPages).keys()].map((page) => (
-              <PaginationItem key={page}>
+
+            {/* Show the first page */}
+            {currentPage > 2 && (
+              <PaginationItem>
                 <PaginationLink
                   href="#"
-                  onClick={() => handlePageChange(page + 1)}
-                  active={page + 1 === currentPage}
+                  onClick={() => handlePageChange(1)}
+                  className={currentPage === 1 ? "bg-blue-500 text-white" : ""} // Active page styling
                 >
-                  {page + 1}
+                  1
                 </PaginationLink>
               </PaginationItem>
-            ))}
+            )}
+
+            {/* Show an ellipsis if the first page isn't close to the current page */}
+            {currentPage > 3 && (
+              <PaginationItem>
+                <PaginationLink href="#">...</PaginationLink>
+              </PaginationItem>
+            )}
+
+            {/* Show the pages around the current page */}
+            {[...Array(5)].map((_, index) => {
+              const page = currentPage - 2 + index;
+              if (page > 0 && page <= totalPages) {
+                return (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      onClick={() => handlePageChange(page)}
+                      className={
+                        page === currentPage ? "bg-blue-500 text-white" : ""
+                      } // Highlight the active page
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
+              return null;
+            })}
+
+            {/* Show an ellipsis if the last page isn't close to the current page */}
+            {currentPage < totalPages - 2 && (
+              <PaginationItem>
+                <PaginationLink href="#">...</PaginationLink>
+              </PaginationItem>
+            )}
+
+            {/* Show the last page */}
+            {currentPage < totalPages - 1 && (
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={() => handlePageChange(totalPages)}
+                  className={
+                    currentPage === totalPages ? "bg-blue-500 text-white" : ""
+                  } // Highlight the active page
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+
             <PaginationItem>
               <PaginationNext
+               className={` ${
+                currentPage === totalPages ? "" : "hover:bg-blue-500"
+              }  cursor-pointer`}
                 onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages} // Disable next button on last page
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </div>
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Receive Remaining Amount</DialogTitle>
             <DialogDescription>
-              <div className="w-full max-w-md bg-white ">
+              <div className="w-full max-w-md  ">
                 <div className="mb-4 ">
                   <p>
                     <b>Customer:</b> {customerName}

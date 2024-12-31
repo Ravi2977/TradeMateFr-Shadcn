@@ -241,7 +241,7 @@ const UserDashboard = () => {
               className="mb-6 shadow-lg border rounded-lg w-[32rem]"
               onClick={() => openCompany(company.companyId)}
             >
-              <CardHeader className="bg-gray-100 p-4 rounded-t-lg">
+              <CardHeader className="p-4 rounded-t-lg">
                 <CardTitle className="text-lg font-semibold">
                   {company.companyName}
                 </CardTitle>
@@ -267,7 +267,7 @@ const UserDashboard = () => {
                   <strong>GST:</strong> {company.gstIn}
                 </p>
               </CardContent>
-              <CardFooter className="p-4 bg-gray-100 rounded-b-lg">
+              <CardFooter className="p-4  rounded-b-lg">
                 <p>
                   <strong>GST Type:</strong> {company.gstType}
                 </p>
