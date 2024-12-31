@@ -13,12 +13,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // ShadCN Alert components
 import axiosInstance from "./AxiosInstance";
 import Payment from "./Payment";
 import { useAuth } from "@/AuthContext/AuthContext";
+import { useTheme } from "next-themes"; // ShadCN theme hook
+import { MoonIcon, SunIcon } from "lucide-react";
 
 function TopNavBar() {
   const email = JSON.parse(localStorage.getItem("login"))?.userNAme;
@@ -27,7 +27,8 @@ function TopNavBar() {
   const [isExpired, setIsExpired] = useState(false);
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
-  const {paymentTracking,setPaymentTracking}=useAuth()
+  const { paymentTracking, setPaymentTracking } = useAuth();
+  const { theme, setTheme } = useTheme("dark"); // ShadCN dark/light mode logic
 
   const fetchUser = async () => {
     const response = await axiosInstance.get(`/user/byemail/${email}`);
@@ -50,7 +51,7 @@ function TopNavBar() {
 
   useEffect(() => {
     fetchUser();
-  }, [email, isPaymentOpen,paymentTracking]);
+  }, [email, isPaymentOpen, paymentTracking]);
 
   const handlePurchaseSubscription = () => {
     // Navigate to the subscription purchase page or handle logic here
@@ -65,9 +66,35 @@ function TopNavBar() {
     setIsPaymentOppen(false);
   };
 
+  const toggleTheme = () => {
+    if (!theme) {
+      console.log("Theme is still loading");
+      return;
+    }
+
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    console.log(`Switched to ${newTheme}`);
+  };
+
   return (
-    <div>
-      <SidebarTrigger />
+    <div className="flex justify-between items-center p-4">
+      <div>
+        <SidebarTrigger />
+      </div>
+      <div>
+        <Button
+          onClick={toggleTheme}
+          variant="outline"
+          className="flex items-center"
+        >
+          {theme === "dark" ? (
+            <SunIcon className="w-5 h-5 text-yellow-500" /> // Icon for Light Mode
+          ) : (
+            <MoonIcon className="w-5 h-5 text-gray-800" /> // Icon for Dark Mode
+          )}
+        </Button>
+      </div>
 
       {/* Show alert if subscription is expiring soon */}
       {isExpiringSoon && (
@@ -82,6 +109,7 @@ function TopNavBar() {
           </AlertDescription>
         </Alert>
       )}
+
       {/* Open the Dialog if subscription expired */}
       {isExpired && (
         <>

@@ -82,6 +82,7 @@ function SaleList() {
         company
       );
       setSalesData(saleDetail.data);
+      console.log(saleDetail.data)
     } catch (error) {
       console.error("Error loading sale details:", error);
     }

@@ -40,7 +40,7 @@ const ReportOFProductAndCustomer = () => {
       {/* Top 5 Most Sold Products */}
       <Card className="flex-1">
         <CardHeader>
-          <CardTitle>Top 5 Most Sold Products</CardTitle>
+          <CardTitle>Sold quantity Products</CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto max-h-[400px]">
           <Table className="min-w-full">
@@ -54,7 +54,7 @@ const ReportOFProductAndCustomer = () => {
             <TableBody>
               {topProducts.map((product, index) => (
                 <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{index + 1}.</TableCell>
                   <TableCell>{product[0]}</TableCell>
                   <TableCell>{product[1]} pieces</TableCell>
                 </TableRow>
@@ -67,13 +67,13 @@ const ReportOFProductAndCustomer = () => {
       {/* Top 5 Customers */}
       <Card className="flex-1 mt-6 md:mt-0">
         <CardHeader>
-          <CardTitle>Top 5 Customers</CardTitle>
+          <CardTitle>Spent by Customers</CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto max-h-[400px]">
           <Table className="min-w-full">
             <TableHeader>
               <TableRow>
-                <TableCell className="text-center">#</TableCell>
+                <TableCell className="text-center">S.No.</TableCell>
                 <TableCell>Customer</TableCell>
                 <TableCell>Total Purchases</TableCell>
               </TableRow>
@@ -81,7 +81,7 @@ const ReportOFProductAndCustomer = () => {
             <TableBody>
               {topCustomers.map((customer, index) => (
                 <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{index + 1}.</TableCell>
                   <TableCell>{customer[0]}</TableCell>
                   <TableCell>Rs. {customer[1]}</TableCell>
                 </TableRow>

@@ -85,6 +85,17 @@ const data = {
       ],
     },
     {
+      title: "Expences",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Add Expence",
+          url: "/addexpense",
+        }
+      ],
+    },
+    {
       title: "Purchase",
       url: "#",
       icon: Bot,
