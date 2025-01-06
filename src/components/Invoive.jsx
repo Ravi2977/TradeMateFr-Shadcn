@@ -53,11 +53,20 @@ const Invoice = ({ saleId }) => {
 
   const { customerModel, sales, totalAmount } = invoiceData;
 
+  function formatDate(date) {
+    // Ensure the input is a Date object
+    if (!(date instanceof Date)) {
+      date = new Date(date); // Convert to Date if it's not
+    }
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    return new Intl.DateTimeFormat("en-GB", options).format(date);
+  }
+
   return (
-    <div>
+    <div className="bg-white rounded">
       <div
         id="invoice"
-        className="p-2 bg-white shadow-md rounded-lg max-w-2xl mx-auto text-xs" // Smaller text size
+        className="p-2 bg-white text-black shadow-md rounded-lg max-w-2xl mx-auto text-xs" // Smaller text size
       >
         {/* Invoice Header */}
         <div className="text-center mb-4">
@@ -66,16 +75,19 @@ const Invoice = ({ saleId }) => {
         </div>
 
         {/* Bill To Section */}
-        <div className="mb-2">
-          <h2 className="font-semibold">Bill To:</h2>
-          <p>{customerModel.customerName}</p>
-          <p>
-            {customerModel.address}, {customerModel.state},{" "}
-            {customerModel.country} - {customerModel.pinCode}
-          </p>
-          <p>Email: {customerModel.email}</p>
-          <p>Mobile: {customerModel.mobile}</p>
-          {customerModel.gstIn && <p>GSTIN: {customerModel.gstIn}</p>}
+        <div className="flex justify-between pr-10">
+          <div className="mb-2">
+            <h2 className="font-semibold">Bill To:</h2>
+            <p>{customerModel.customerName}</p>
+            <p>
+              {customerModel.address}, {customerModel.state},{" "}
+              {customerModel.country} - {customerModel.pinCode}
+            </p>
+            <p>Email: {customerModel.email}</p>
+            <p>Mobile: {customerModel.mobile}</p>
+            {customerModel.gstIn && <p>GSTIN: {customerModel.gstIn}</p>}
+          </div>
+          <div>Date :- {formatDate(sales[0].date)}</div>
         </div>
 
         {/* Company Information */}
@@ -176,9 +188,11 @@ const Invoice = ({ saleId }) => {
           </ul>
         </div>
       </div>
-      <Button className="w-full mt-2" onClick={handlePrint}>
-        Print Invoice
-      </Button>
+      <div className="flex justify-center">
+        <Button className=" m-2 bg-black text-white w-40" onClick={handlePrint}>
+          Print Invoice
+        </Button>
+      </div>
     </div>
   );
 };

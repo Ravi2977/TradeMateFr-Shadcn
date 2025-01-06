@@ -19,6 +19,10 @@ export const AuthProvider = ({ children }) => {
   const [changeValue, setChangeValue] = useState(1); // Moved here
   const [isPaymentOpen, setIsPaymentOppen] = useState(false);
   const [paymentTracking,setPaymentTracking]=useState(0)
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+    const [termStatus, setTermStatus] = useState(false);
+  
+  
   const value = {
     auth,
     changeValue, // Added changeValue to the context
@@ -26,7 +30,9 @@ export const AuthProvider = ({ children }) => {
     isPaymentOpen,
     setIsPaymentOppen,
     paymentTracking,
-    setPaymentTracking
+    setPaymentTracking,
+    isTermsOpen, setIsTermsOpen,
+    termStatus, setTermStatus
   };
 
   return (

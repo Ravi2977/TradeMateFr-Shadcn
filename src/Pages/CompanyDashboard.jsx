@@ -180,8 +180,8 @@ function CompanyDashboard() {
   return (
     <div className="p-4 space-y-6">
       {/* Company Information Section */}
-      <div className="flex">
-        <div className=" shadow-md rounded-lg p-6">
+      <div className="flex justify-between">
+        <div className=" shadow-md rounded-lg p-6 mr-2">
           <h2 className="text-2xl font-bold mb-4">{company.companyName}</h2>
           <p>
             <strong>Mobile:</strong> {company.mobile || "N/A"}
