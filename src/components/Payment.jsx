@@ -86,6 +86,7 @@ function Payment() {
         .then((response) => {
           console.log("Payment initiated. Amount:", netPayableAmount);
 
+
           if (response.data.status === "created") {
             console.log(response.data);
             axiosInstance.post(`/auth/updateOrder`, {
