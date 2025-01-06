@@ -319,7 +319,7 @@ function SaleList() {
                       </Tooltip>
                     </TooltipProvider>
 
-                    <Dialog>
+                    <Dialog className="bg-white">
                       <DialogTrigger>
                         <TooltipProvider>
                           <Tooltip>
@@ -339,7 +339,7 @@ function SaleList() {
                       </DialogTrigger>
                       <DialogContent className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                          <DialogTitle>
+                          <DialogTitle className="flex justify-center">
                             Invoice for {sale.customer.customerName}
                           </DialogTitle>
                           <DialogDescription>
