@@ -75,6 +75,7 @@ function Payment() {
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
+
     if (termStatus) {
       setIsPaymentOppen(false);
       axios
@@ -86,6 +87,7 @@ function Payment() {
         })
         .then((response) => {
           console.log("Payment initiated. Amount:", netPayableAmount);
+
 
           if (response.data.status === "created") {
             console.log(response.data);
