@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { Button } from "./ui/button";
 import { Label } from "recharts";
 import TermsConditions from "@/Pages/TermsConditions";
+import UpiPaymentQR from "./UpiPaymentQR ";
 
 function Payment() {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -31,8 +32,8 @@ function Payment() {
   const [discount, setDiscount] = useState(0);
   const { isPaymentOpen, setIsPaymentOppen } = useAuth();
   const { paymentTracking, setPaymentTracking } = useAuth();
-  const {termStatus, setTermStatus} = useAuth();
-  const {isTermsOpen, setIsTermsOpen} = useAuth();
+  const { termStatus, setTermStatus } = useAuth();
+  const { isTermsOpen, setIsTermsOpen } = useAuth();
   const plans = {
     basic: {
       price: 299,
@@ -168,11 +169,11 @@ function Payment() {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between mt-4 gap-4">
+      <div className="flex flex-wrap justify-between gap-4 mt-4">
         {Object.entries(plans).map(([key, plan]) => (
           <Card
             key={key}
-            className={`w-80 border ${
+            className={`w-full sm:w-80 border ${
               selectedPlan === key ? "border-black" : "border-gray-200"
             }`}
           >
@@ -210,84 +211,94 @@ function Payment() {
       </div>
 
       {selectedPlan && (
-        <div className="mt-8 p-4 border rounded-lg bg-gray-50">
-          <h2 className="text-lg font-bold text-black">
-            Selected Plan:{" "}
-            {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}
-          </h2>
-          <div className="mt-4 flex items-center gap-4">
-            <label htmlFor="months" className="font-medium text-black">
-              Select Months:
-            </label>
-            <select
-              id="months"
-              value={months}
-              onChange={(e) => setMonths(Number(e.target.value))}
-              className="border border-gray-300 px-2 py-1 rounded text-black"
-            >
-              {[1, 3, 6, 12].map((m) => (
-                <option key={m} value={m}>
-                  {m} Month{m > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
+  <div className="mt-8 p-4 border rounded-lg bg-gray-50 flex flex-col lg:flex-row justify-between gap-6">
+    <div className="w-full lg:w-1/2">
+      <h2 className="text-lg font-bold text-black">
+        Selected Plan:{" "}
+        {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}
+      </h2>
+      
+      <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <label htmlFor="months" className="font-medium text-black">
+          Select Months:
+        </label>
+        <select
+          id="months"
+          value={months}
+          onChange={(e) => setMonths(Number(e.target.value))}
+          className="border border-gray-300 px-2 py-1 rounded text-black"
+        >
+          {[1, 3, 6, 12].map((m) => (
+            <option key={m} value={m}>
+              {m} Month{m > 1 ? "s" : ""}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <div className="mt-4">
-            <label htmlFor="coupon" className="font-medium text-black">
-              Apply Coupon:
-            </label>
-            <input
-              type="text"
-              id="coupon"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-              className="border border-gray-300 px-2 py-1 ml-2 rounded text-black"
-              placeholder="Enter coupon code"
-            />
-            <button
-              onClick={applyCoupon}
-              className="ml-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-            >
-              Apply
-            </button>
-          </div>
+      <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <label htmlFor="coupon" className="font-medium text-black">
+          Apply Coupon:
+        </label>
+        <input
+          type="text"
+          id="coupon"
+          value={coupon}
+          onChange={(e) => setCoupon(e.target.value)}
+          className="border border-gray-300 px-2 py-1 ml-2 rounded text-black"
+          placeholder="Enter coupon code"
+        />
+        <button
+          onClick={applyCoupon}
+          className="mt-2 sm:mt-0 ml-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+        >
+          Apply
+        </button>
+      </div>
 
-          <div className="mt-4">
-            <p className="text-gray-800">
-              Total Amount: ₹{totalAmount.toFixed(2)}
-            </p>
-            <p className="text-gray-800">Discount: ₹{discount.toFixed(2)}</p>
-            <p className="font-bold text-black">
-              Net Payable Amount: ₹{netPayableAmount.toFixed(2)}
-            </p>
-          </div>
-          {/* Agree/Disagree Checkbox */}
-          <div className="mt-4 flex items-center space-x-2">
-            <input
-              // id="agree-terms"
-              type="checkbox"
-              checked={termStatus}
-              onChange={() => setTermStatus((prev) => !prev)} // Toggle termStatus
-              className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="agree-terms">
-              <a
-                className="underline text-blue-800 cursor-pointer font-semibold"
-                onClick={() => setIsTermsOpen(true)}
-              >
-                Terms & Conditions
-              </a>
-            </label>
-          </div>
-          <button
-            onClick={handleOnSubmit}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      <div className="mt-4">
+        <p className="text-gray-800">
+          Total Amount: ₹{totalAmount.toFixed(2)}
+        </p>
+        <p className="text-gray-800">Discount: ₹{discount.toFixed(2)}</p>
+        <p className="font-bold text-black">
+          Net Payable Amount: ₹{netPayableAmount.toFixed(2)}
+        </p>
+      </div>
+
+      {/* Agree/Disagree Checkbox */}
+      <div className="mt-4 flex items-center space-x-2">
+        <input
+          type="checkbox"
+          checked={termStatus}
+          onChange={() => setTermStatus((prev) => !prev)} // Toggle termStatus
+          className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="agree-terms">
+          <a
+            className="underline text-blue-800 cursor-pointer font-semibold"
+            onClick={() => setIsTermsOpen(true)}
           >
-            Proceed to Pay
-          </button>
-        </div>
-      )}
+            Terms & Conditions
+          </a>
+        </label>
+      </div>
+
+      {/* <button
+        onClick={handleOnSubmit}
+        className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      >
+        Proceed to Pay
+      </button> */}
+    </div>
+
+    {/* Right side: UpiPaymentQR */}
+   {termStatus && <div className="w-full lg:w-1/2 mt-6 lg:mt-0">
+      <UpiPaymentQR amount={netPayableAmount.toFixed(2)} months={months} />
+    </div>}
+  </div>
+)}
+
 
       <div className="mt-8 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-lg font-bold text-black">Offers</h2>
@@ -298,7 +309,7 @@ function Payment() {
         </ul>
       </div>
 
-      <Dialog open={isTermsOpen} onOpenChange={()=>setIsTermsOpen(false)}>
+      <Dialog open={isTermsOpen} onOpenChange={() => setIsTermsOpen(false)}>
         <DialogContent className="w-full max-w-3xl h-[70vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Terms & Conditions</DialogTitle>
