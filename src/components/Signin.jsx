@@ -162,9 +162,10 @@ function Signin() {
         )}
 
         {!isOtpGenerated ? (
-          <Button className="w-full mb-4" onClick={handleGenerateOtp}>
+          <Button className="w-full mb-4" onClick={handleSignIn}>
             <Mail className="mr-2 h-4 w-4" />{" "}
-            {isLoading ? <Loader className="mr-2" /> : "Generate OTP"}
+            {/* {isLoading ? <Loader className="mr-2" /> : "Generate OTP"} */}
+            Sigin
           </Button>
         ) : (
           <Button className="w-full mb-4" onClick={handleSignIn}>

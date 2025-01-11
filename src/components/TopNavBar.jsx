@@ -79,36 +79,40 @@ function TopNavBar() {
 
   return (
     <div className="flex justify-between items-center p-4">
-      <div>
-        <SidebarTrigger />
-      </div>
-      <div>
-        <Button
-          onClick={toggleTheme}
-          variant="outline"
-          className="flex items-center"
-        >
-          {theme === "dark" ? (
-            <SunIcon className="w-5 h-5 text-yellow-500" /> // Icon for Light Mode
-          ) : (
-            <MoonIcon className="w-5 h-5 text-gray-800" /> // Icon for Dark Mode
-          )}
-        </Button>
-      </div>
+      <div className=" w-full">
+        <div className="flex justify-between mb-2">
+          <div>
+            <SidebarTrigger />
+          </div>
+          <div>
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              className="flex items-center"
+            >
+              {theme === "dark" ? (
+                <SunIcon className="w-5 h-5 text-yellow-500" /> // Icon for Light Mode
+              ) : (
+                <MoonIcon className="w-5 h-5 text-gray-800" /> // Icon for Dark Mode
+              )}
+            </Button>
+          </div>
+        </div>
 
-      {/* Show alert if subscription is expiring soon */}
-      {isExpiringSoon && (
-        <Alert variant="destructive">
-          <AlertTitle>Your subscription is expiring soon!</AlertTitle>
-          <AlertDescription>
-            <div className="flex justify-between">
-              Your subscription will expire in {userData?.remainingDays} days.
-              Please renew it soon to continue enjoying the service.
-              <Button onClick={openPayment}>See Pricing</Button>
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
+        {/* Show alert if subscription is expiring soon */}
+        {isExpiringSoon && (
+          <Alert variant="destructive">
+            <AlertTitle>Your subscription is expiring soon!</AlertTitle>
+            <AlertDescription>
+              <div className="flex justify-between">
+                Your subscription will expire in {userData?.remainingDays} days.
+                Please renew it soon to continue enjoying the service.
+                <Button onClick={openPayment}>See Pricing</Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
 
       {/* Open the Dialog if subscription expired */}
       {isExpired && (

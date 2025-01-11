@@ -9,8 +9,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/AuthContext/AuthContext";
 import axiosInstance from "./AxiosInstance";
+import { toast } from "react-toastify";
+import { Button } from "./ui/button";
+import { Label } from "recharts";
+import TermsConditions from "@/Pages/TermsConditions";
+import UpiPaymentQR from "./UpiPaymentQR ";
 
 function Payment() {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -18,9 +31,9 @@ function Payment() {
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const { isPaymentOpen, setIsPaymentOppen } = useAuth();
-  const {paymentTracking,setPaymentTracking}=useAuth()
-
-
+  const { paymentTracking, setPaymentTracking } = useAuth();
+  const { termStatus, setTermStatus } = useAuth();
+  const { isTermsOpen, setIsTermsOpen } = useAuth();
   const plans = {
     basic: {
       price: 299,
@@ -37,7 +50,7 @@ function Payment() {
   };
 
   const offers = [
-    "10% off on annual subscription!",
+    "10% off on annual(12 Month) subscription!",
     "Free first month with coupon 'FREEMONTH'",
   ];
 
@@ -62,102 +75,107 @@ function Payment() {
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    setIsPaymentOppen(false);
-    axios
-      .post(`https://backend.ravicomputer.online/auth/create_order`, {
-        amount: netPayableAmount,
-        info: "Order_request",
-        email: JSON.parse(localStorage.getItem("login")).userNAme,
-        durationInMonths:months
-      })
-      .then((response) => {
-        console.log("Payment initiated. Amount:", netPayableAmount);
 
-        if (response.data.status === "created") {
-          console.log(response.data);
-          axiosInstance.post(`/auth/updateOrder`, {
-            orderId: response.data.id,
-            createDate: response.data.created_at,
-            currency: response.data.currency,
-            orderEmail: JSON.parse(localStorage.getItem("login")).userNAme,
-          });
-          const razorpay = new window.Razorpay({
-            key: "rzp_test_BK3KSXeGUlGCaD", // Your Razorpay API key
-            currency: "INR",
-          });
+    if (termStatus) {
+      setIsPaymentOppen(false);
+      axios
+        .post(`https://backend.ravicomputer.online/auth/create_order`, {
+          amount: netPayableAmount,
+          info: "Order_request",
+          email: JSON.parse(localStorage.getItem("login")).userNAme,
+          durationInMonths: months,
+        })
+        .then((response) => {
+          console.log("Payment initiated. Amount:", netPayableAmount);
 
-          razorpay.once("payment.failed", function (response) {
-            console.error("Payment failed:", response);
-            // Display user-friendly error message or handle the failure
-          });
 
-          razorpay.once("payment.success", function (response) {
-            console.log("Payment successful:", response);
-            // Handle successful payment (e.g., update UI, redirect user)
-          });
-
-          let options = {
-            amount: response.data.amount, // Amount in smallest currency unit (e.g., paisa)
-            currency: "INR",
-            order_id: response.data.id,
-            name: "TradeMate",
-            description: "Payment for Product/Service",
-            image: favicon, // URL to your company logo
-            handler: function (response) {
-              console.log(response.razorpay_payment_id);
-              console.log(response.razorpay_order_id);
-              console.log(response.razorpay_signature);
-              console.log(response);
-              axiosInstance.post(`/auth/successOrder`, {
-                orderId: response.razorpay_order_id,
-                razorpay_payment_id:response.razorpay_payment_id,
-                razorpay_signature:response.razorpay_signature,
-
-              });
-              alert("Payment succesfull !!");
-              setPaymentTracking((prev)=>prev+1)
-            },
-            prefill: {
-              name: "",
-              email: "",
-              contact: "",
-            },
-            notes: {
-              address: "TradeMate-Simplifying business management",
-            },
-            theme: {
-              color: "#3399cc",
-            },
-          };
-
-          // Create a new instance of Razorpay and then call open()
-          const rzpInstance = new window.Razorpay(options);
-          rzpInstance.open();
-          rzpInstance.on("payment.failed", function (response) {
-            axiosInstance.post(`/auth/failedPayment`, {
-              orderId: response.error.metadata.order_id,
-              status: response.error.step,
+          if (response.data.status === "created") {
+            console.log(response.data);
+            axiosInstance.post(`/auth/updateOrder`, {
+              orderId: response.data.id,
+              createDate: response.data.created_at,
+              currency: response.data.currency,
+              orderEmail: JSON.parse(localStorage.getItem("login")).userNAme,
             });
-            alert("Payment failed try again");
-          });
-        } else {
-          console.error("Failed to create payment order:", response.data);
+            const razorpay = new window.Razorpay({
+              key: "rzp_test_BK3KSXeGUlGCaD", // Your Razorpay API key
+              currency: "INR",
+            });
+
+            razorpay.once("payment.failed", function (response) {
+              console.error("Payment failed:", response);
+              // Display user-friendly error message or handle the failure
+            });
+
+            razorpay.once("payment.success", function (response) {
+              console.log("Payment successful:", response);
+              // Handle successful payment (e.g., update UI, redirect user)
+            });
+
+            let options = {
+              amount: response.data.amount, // Amount in smallest currency unit (e.g., paisa)
+              currency: "INR",
+              order_id: response.data.id,
+              name: "TradeMate",
+              description: "Payment for Product/Service",
+              image: favicon, // URL to your company logo
+              handler: function (response) {
+                console.log(response.razorpay_payment_id);
+                console.log(response.razorpay_order_id);
+                console.log(response.razorpay_signature);
+                console.log(response);
+                axiosInstance.post(`/auth/successOrder`, {
+                  orderId: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                });
+                alert("Payment succesfull !!");
+                setPaymentTracking((prev) => prev + 1);
+              },
+              prefill: {
+                name: "",
+                email: "",
+                contact: "",
+              },
+              notes: {
+                address: "TradeMate-Simplifying business management",
+              },
+              theme: {
+                color: "#3399cc",
+              },
+            };
+
+            // Create a new instance of Razorpay and then call open()
+            const rzpInstance = new window.Razorpay(options);
+            rzpInstance.open();
+            rzpInstance.on("payment.failed", function (response) {
+              axiosInstance.post(`/auth/failedPayment`, {
+                orderId: response.error.metadata.order_id,
+                status: response.error.step,
+              });
+              alert("Payment failed try again");
+            });
+          } else {
+            console.error("Failed to create payment order:", response.data);
+            // Display user-friendly error message or handle the failure
+          }
+        })
+        .catch((error) => {
+          console.error("Error occurred while creating payment order:", error);
           // Display user-friendly error message or handle the failure
-        }
-      })
-      .catch((error) => {
-        console.error("Error occurred while creating payment order:", error);
-        // Display user-friendly error message or handle the failure
-      });
+        });
+    } else {
+      toast.info("Please Accept terms and Conditions");
+    }
   };
 
   return (
     <div className="p-4">
-      <div className="flex justify-between mt-4 gap-4">
+      <div className="flex flex-wrap justify-between gap-4 mt-4">
         {Object.entries(plans).map(([key, plan]) => (
           <Card
             key={key}
-            className={`w-80 border ${
+            className={`w-full sm:w-80 border ${
               selectedPlan === key ? "border-black" : "border-gray-200"
             }`}
           >
@@ -195,67 +213,94 @@ function Payment() {
       </div>
 
       {selectedPlan && (
-        <div className="mt-8 p-4 border rounded-lg bg-gray-50">
-          <h2 className="text-lg font-bold text-black">
-            Selected Plan:{" "}
-            {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}
-          </h2>
-          <div className="mt-4 flex items-center gap-4">
-            <label htmlFor="months" className="font-medium text-black">
-              Select Months:
-            </label>
-            <select
-              id="months"
-              value={months}
-              onChange={(e) => setMonths(Number(e.target.value))}
-              className="border border-gray-300 px-2 py-1 rounded text-black"
-            >
-              {[1, 3, 6, 12].map((m) => (
-                <option key={m} value={m}>
-                  {m} Month{m > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
+  <div className="mt-8 p-4 border rounded-lg bg-gray-50 flex flex-col lg:flex-row justify-between gap-6">
+    <div className="w-full lg:w-1/2">
+      <h2 className="text-lg font-bold text-black">
+        Selected Plan:{" "}
+        {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}
+      </h2>
+      
+      <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <label htmlFor="months" className="font-medium text-black">
+          Select Months:
+        </label>
+        <select
+          id="months"
+          value={months}
+          onChange={(e) => setMonths(Number(e.target.value))}
+          className="border border-gray-300 px-2 py-1 rounded text-black"
+        >
+          {[1, 3, 6, 12].map((m) => (
+            <option key={m} value={m}>
+              {m} Month{m > 1 ? "s" : ""}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <div className="mt-4">
-            <label htmlFor="coupon" className="font-medium text-black">
-              Apply Coupon:
-            </label>
-            <input
-              type="text"
-              id="coupon"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-              className="border border-gray-300 px-2 py-1 ml-2 rounded text-black"
-              placeholder="Enter coupon code"
-            />
-            <button
-              onClick={applyCoupon}
-              className="ml-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-            >
-              Apply
-            </button>
-          </div>
+      <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <label htmlFor="coupon" className="font-medium text-black">
+          Apply Coupon:
+        </label>
+        <input
+          type="text"
+          id="coupon"
+          value={coupon}
+          onChange={(e) => setCoupon(e.target.value)}
+          className="border border-gray-300 px-2 py-1 ml-2 rounded text-black"
+          placeholder="Enter coupon code"
+        />
+        <button
+          onClick={applyCoupon}
+          className="mt-2 sm:mt-0 ml-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+        >
+          Apply
+        </button>
+      </div>
 
-          <div className="mt-4">
-            <p className="text-gray-800">
-              Total Amount: ₹{totalAmount.toFixed(2)}
-            </p>
-            <p className="text-gray-800">Discount: ₹{discount.toFixed(2)}</p>
-            <p className="font-bold text-black">
-              Net Payable Amount: ₹{netPayableAmount.toFixed(2)}
-            </p>
-          </div>
+      <div className="mt-4">
+        <p className="text-gray-800">
+          Total Amount: ₹{totalAmount.toFixed(2)}
+        </p>
+        <p className="text-gray-800">Discount: ₹{discount.toFixed(2)}</p>
+        <p className="font-bold text-black">
+          Net Payable Amount: ₹{netPayableAmount.toFixed(2)}
+        </p>
+      </div>
 
-          <button
-            onClick={handleOnSubmit}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      {/* Agree/Disagree Checkbox */}
+      <div className="mt-4 flex items-center space-x-2">
+        <input
+          type="checkbox"
+          checked={termStatus}
+          onChange={() => setTermStatus((prev) => !prev)} // Toggle termStatus
+          className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="agree-terms">
+          <a
+            className="underline text-blue-800 cursor-pointer font-semibold"
+            onClick={() => setIsTermsOpen(true)}
           >
-            Proceed to Pay
-          </button>
-        </div>
-      )}
+            Terms & Conditions
+          </a>
+        </label>
+      </div>
+
+      {/* <button
+        onClick={handleOnSubmit}
+        className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      >
+        Proceed to Pay
+      </button> */}
+    </div>
+
+    {/* Right side: UpiPaymentQR */}
+   {termStatus && <div className="w-full lg:w-1/2 mt-6 lg:mt-0">
+      <UpiPaymentQR amount={netPayableAmount.toFixed(2)} months={months} />
+    </div>}
+  </div>
+)}
+
 
       <div className="mt-8 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-lg font-bold text-black">Offers</h2>
@@ -265,6 +310,17 @@ function Payment() {
           ))}
         </ul>
       </div>
+
+      <Dialog open={isTermsOpen} onOpenChange={() => setIsTermsOpen(false)}>
+        <DialogContent className="w-full max-w-3xl h-[70vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Terms & Conditions</DialogTitle>
+            <DialogDescription>
+              <TermsConditions />
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
