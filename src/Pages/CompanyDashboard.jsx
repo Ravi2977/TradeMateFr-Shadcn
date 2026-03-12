@@ -207,7 +207,7 @@ function CompanyDashboard() {
           <img
             src={company.image}
             alt="Company Sign and Stamp"
-            className="mb-4 w-32 h-32 object-cover"
+            className="m-4  h-24 object-cover"
           />
 
           <Dialog open={isEditing} onOpenChange={setIsEditing}>

@@ -25,6 +25,7 @@ import PurchaseList from "./Pages/PurchaseList";
 import TopNavBar from "./components/TopNavBar";
 import { ThemeProvider } from "next-themes";
 import ExpenseList from "./Pages/ExpenseList";
+import GstReport from "./Pages/GstReport";
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
           <Route path="/addseller" element={<AddSeller />} />
           <Route path="/sellers" element={<SellerList />} />
           <Route path="/addpurchase" element={<AddPurchase />} />
+          <Route path="/gstReport" element={<GstReport />} />
           <Route path="/purchases" element={<PurchaseList />} />
           <Route path="/addexpense" element={<ExpenseList />} />
 

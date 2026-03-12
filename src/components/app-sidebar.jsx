@@ -112,6 +112,10 @@ const data = {
           title: "Remainings",
           url: "/raminngPurchases",
         },
+        {
+          title: "GST Report",
+          url: "/gstReport",
+        },
       ],
     },
     {

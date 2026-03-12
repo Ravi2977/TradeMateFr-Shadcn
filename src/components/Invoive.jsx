@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import html2pdf from "html2pdf.js";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "./AxiosInstance";
 import {
@@ -14,11 +13,10 @@ import {
 
 const Invoice = ({ saleId }) => {
   const [invoiceData, setInvoiceData] = useState(null);
-  const [company, setCompany] = useState(
+
+  const [company] = useState(
     JSON.parse(localStorage.getItem("companyDetials"))
   );
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchInvoiceData();
@@ -28,17 +26,16 @@ const Invoice = ({ saleId }) => {
     try {
       const response = await axiosInstance.post(`/sales/byid/${saleId}`);
       setInvoiceData(response.data);
-      console.log(response.data);
     } catch (error) {
-      console.error("Error fetching invoice data", error);
       toast.error("Failed to fetch invoice data");
     }
   };
 
   const handlePrint = () => {
     const invoiceElement = document.getElementById("invoice");
+
     const options = {
-      margin: [0.2, 0.2, 0.2, 0.2], // Reduced margins
+      margin: [0.2, 0.2, 0.2, 0.2],
       filename: `${invoiceData?.customerModel?.customerName}-Invoice.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
@@ -46,153 +43,300 @@ const Invoice = ({ saleId }) => {
     };
 
     html2pdf().set(options).from(invoiceElement).save();
-    toast.success("Invoice downloaded as PDF!");
+    toast.success("Invoice downloaded!");
   };
 
   if (!invoiceData) return <p>Loading...</p>;
 
   const { customerModel, sales, totalAmount } = invoiceData;
 
+  const taxableAmount = totalAmount / 1.18;
+  const cgst = taxableAmount * 0.09;
+  const sgst = taxableAmount * 0.09;
+
   function formatDate(date) {
-    // Ensure the input is a Date object
     if (!(date instanceof Date)) {
-      date = new Date(date); // Convert to Date if it's not
+      date = new Date(date);
     }
     const options = { day: "numeric", month: "short", year: "numeric" };
     return new Intl.DateTimeFormat("en-GB", options).format(date);
   }
 
   return (
-    <div className="bg-white rounded">
+    <div className="bg-white">
+
       <div
         id="invoice"
-        className="p-2 bg-white text-black shadow-md rounded-lg max-w-2xl mx-auto text-xs" // Smaller text size
+        className="relative bg-white text-black shadow-md rounded-lg max-w-3xl mx-auto text-xs p-4"
       >
-        {/* Invoice Header */}
-        <div className="text-center mb-4">
-          <h1 className="text-lg font-bold">Invoice</h1>
-          <p className="text-xs text-gray-500">Invoice #TD{+sales[0]?.id}</p>
+
+        {/* WATERMARK */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <h1 className="text-6xl font-bold text-gray-200 opacity-60 rotate-[-30deg]">
+            Ventra Enterprises
+          </h1>
         </div>
 
-        {/* Bill To Section */}
-        <div className="flex justify-between pr-10">
-          <div className="mb-2">
-            <h2 className="font-semibold">Bill To:</h2>
-            <p>{customerModel.customerName}</p>
+        {/* GST HEADER */}
+        <div className="flex justify-between border-b pb-1 text-[11px] font-semibold relative z-10">
+          <span>GSTIN : {company.gstIn}</span>
+          <span className="font-bold">TAX INVOICE</span>
+          <span></span>
+        </div>
+
+        {/* COMPANY HEADER */}
+        <div className="flex items-center justify-between border-b py-3 relative z-10">
+
+
+
+          <div className="text-center flex-1">
+            <h1 className="text-lg font-bold">{company.companyName}</h1>
             <p>
-              {customerModel.address}, {customerModel.state},{" "}
-              {customerModel.country} - {customerModel.pinCode}
+              {company.companyAddress}, {company.district}, {company.state}
             </p>
-            <p>Email: {customerModel.email}</p>
-            <p>Mobile: {customerModel.mobile}</p>
-            {customerModel.gstIn && <p>GSTIN: {customerModel.gstIn}</p>}
-          </div>
-          <div>Date :- {formatDate(sales[0].date)}</div>
-        </div>
-
-        {/* Company Information */}
-        <div className="mb-2">
-          <h2 className="font-semibold">Bill From:</h2>
-          <p>{company.companyName}</p>
-          <p>
-            {company.companyAddress}, {company.district}, {company.state}
-          </p>
-          <p>
-            {company.country} - {company.pinCode}
-          </p>
-          <p>Mobile: {company.mobile}</p>
-
-          {/* Highlighted Account Details */}
-          <div className="bg-yellow-50 p-2 rounded-md mt-2 text-xs">
-            <h2 className="font-semibold mb-1">Account Details</h2>
-            <table className="w-full text-left">
-              <tbody>
-                <tr>
-                  <td className="font-semibold py-1 pr-2">Bank:</td>
-                  <td>{company.bankName}</td>
-                </tr>
-                <tr>
-                  <td className="font-semibold py-1 pr-2">
-                    Account Holder Name:
-                  </td>
-                  <td>{company.companyName}</td>
-                </tr>
-                <tr>
-                  <td className="font-semibold py-1 pr-2">Account Number:</td>
-                  <td>{company.accountNumber}</td>
-                </tr>
-                <tr>
-                  <td className="font-semibold py-1 pr-2">IFSC Code:</td>
-                  <td>{company.ifscCode}</td>
-                </tr>
-              </tbody>
-            </table>
+            <p>{company.country} - {company.pinCode}</p>
+            <p>Mobile : {company.mobile}</p>
           </div>
 
-          {/* Conditional GST Information */}
-          {company.gstIn && <p className="mt-2">GSTIN: {company.gstIn}</p>}
         </div>
 
-        {/* Sales Items Table */}
-        <Table className="mb-4 text-xs">
+        {/* BILL SECTION */}
+
+        <div className="grid grid-cols-2 border-b text-xs relative z-10">
+
+          <div className="p-2 border-r">
+
+            <p className="font-semibold">Bill To :</p>
+
+            <p className="font-bold">{customerModel.customerName}</p>
+
+            <p>
+              {customerModel.address}, {customerModel.state}
+            </p>
+
+            <p>Mobile : {customerModel.mobile}</p>
+
+            {customerModel.gstIn && (
+              <p>GSTIN : {customerModel.gstIn}</p>
+            )}
+
+          </div>
+
+          <div className="p-2">
+
+            <p>Invoice No : <b>TD{sales[0]?.id}</b></p>
+
+            <p>Date : {formatDate(sales[0].date)}</p>
+
+            <p>Place of Supply : {customerModel.state}</p>
+
+          </div>
+
+        </div>
+
+
+        {/* SALES TABLE */}
+
+        <Table className="w-full text-xs border mt-2 relative z-10">
+
           <TableHeader>
-            <TableRow>
-              <TableCell className="font-semibold">Item</TableCell>
-              <TableCell className="font-semibold">Quantity</TableCell>
-              <TableCell className="font-semibold">Unit Price</TableCell>
-              <TableCell className="font-semibold">Total</TableCell>
+
+            <TableRow className="bg-gray-200">
+
+              <TableCell className="border font-semibold">S.No</TableCell>
+
+              <TableCell className="border font-semibold">Description</TableCell>
+
+              <TableCell className="border font-semibold text-center">
+                Qty
+              </TableCell>
+
+              <TableCell className="border font-semibold text-center">
+                Rate
+              </TableCell>
+
+              <TableCell className="border font-semibold text-center">
+                Amount
+              </TableCell>
+
             </TableRow>
+
           </TableHeader>
+
+
           <TableBody>
+
             {sales.map((sale, index) => (
+
               <TableRow key={index}>
-                <TableCell>{sale.item.itemName}</TableCell>
-                <TableCell>{sale.quantity}</TableCell>
-                <TableCell>₹{sale.rate.toFixed(2)}</TableCell>
-                <TableCell>₹{sale.totalAmmount.toFixed(2)}</TableCell>
+
+                <TableCell className="border">{index + 1}</TableCell>
+
+                <TableCell className="border">
+                  {sale.item.itemName}
+                </TableCell>
+
+                <TableCell className="border text-center">
+                  {sale.quantity}
+                </TableCell>
+
+                <TableCell className="border text-center">
+                  ₹{sale.rate.toFixed(2)}
+                </TableCell>
+
+                <TableCell className="border text-center">
+                  ₹{sale.totalAmmount.toFixed(2)}
+                </TableCell>
+
               </TableRow>
+
             ))}
+
           </TableBody>
+
         </Table>
 
-        {/* Total Amount */}
-        <div className="flex justify-between font-semibold mt-4">
-          <span>Total Amount:</span>
-          <span>₹{totalAmount.toFixed(2)}</span>
+
+        {/* GST SUMMARY */}
+
+        <div className="flex justify-end mt-3 relative z-10">
+
+          <table className="w-72 text-xs border">
+
+            <tbody>
+
+              <tr>
+                <td className="border p-1">Taxable Amount</td>
+                <td className="border text-right p-1">
+                  ₹{taxableAmount.toFixed(2)}
+                </td>
+              </tr>
+
+              <tr>
+                <td className="border p-1">CGST (9%)</td>
+                <td className="border text-right p-1">
+                  ₹{cgst.toFixed(2)}
+                </td>
+              </tr>
+
+              <tr>
+                <td className="border p-1">SGST (9%)</td>
+                <td className="border text-right p-1">
+                  ₹{sgst.toFixed(2)}
+                </td>
+              </tr>
+
+              <tr className="font-bold bg-gray-100">
+
+                <td className="border p-1">Total Amount</td>
+
+                <td className="border text-right p-1">
+                  ₹{totalAmount.toFixed(2)}
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
         </div>
 
-        {/* Signature and Stamp Section */}
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex flex-col items-center">
-            <p className="font-semibold">Authorized Signature & Stamp</p>
-            <div className="w-24 h-20 border border-gray-300 mt-3">
-              <img
-                src={company.image}
-                alt="Signature & Stamp"
-                className="w-full h-full object-contain"
-              />
-            </div>
+
+        {/* FOOTER */}
+
+        <div className="grid grid-cols-2 mt-4 text-xs border-t pt-2 relative z-10">
+
+          <div>
+
+            <p className="font-semibold">Bank Details</p>
+
+            <p>Bank : {company.bankName}</p>
+
+            <p>A/C No : {company.accountNumber}</p>
+
+            <p>IFSC : {company.ifscCode}</p>
+
           </div>
+
+
+          <div className="text-right">
+
+            <p className="font-semibold">
+              For {company.companyName}
+            </p>
+
+            <div className="h-16"></div>
+            <div className="flex flex-col items-end justify-end gap-1">
+              <div className="w-24">
+                <img src={company.image} className="w-full object-contain" />
+              </div>
+              <p className="border-t pt-1">
+                Authorised Signatory
+              </p>
+            </div>
+
+          </div>
+
         </div>
 
-        {/* Terms and Conditions */}
-        <div className="mt-4 border-t border-gray-200 pt-2 text-xs">
-          <h2 className="font-semibold">Terms & Conditions</h2>
+
+        {/* TERMS */}
+
+        <div className="mt-3 text-[10px] border-t pt-2 relative z-10">
+
+          <p className="font-semibold">Terms & Conditions</p>
+
           <ul className="list-disc ml-4">
-            <li>Goods once sold will not be returned or refunded.</li>
-            <li>All taxes are applicable as per government regulations.</li>
+
+            <li>Goods once sold will not be returned.</li>
+
+            <li>All taxes applicable as per government rules.</li>
+
             <li>
-              For any queries regarding this invoice, please contact us at
-              ravicomputercompany@gmail.com.
+              For queries contact : enterprisesventra@gmail.com
             </li>
+
           </ul>
+
         </div>
+
+       <div className="mt-4 border-t pt-3 text-center relative z-10">
+
+  <p className="text-[10px] text-gray-500 mb-2">
+    This is a computer-generated invoice and does not require a signature.
+  </p>
+
+  <div className="bg-gray-50 rounded-md py-3 px-4">
+
+    <h2 className="text-sm font-semibold text-gray-800">
+      Thank You for Choosing Ventra Enterprises
+    </h2>
+
+    <p className="text-[11px] text-gray-600 mt-1">
+      We truly appreciate your business and look forward to serving you again.
+    </p>
+
+  </div>
+
+</div>
+
       </div>
-      <div className="flex justify-center">
-        <Button className=" m-2 bg-black text-white w-40" onClick={handlePrint}>
+
+
+      {/* PRINT BUTTON */}
+
+      <div className="flex justify-center mt-3">
+
+        <Button
+          className="bg-black text-white w-40"
+          onClick={handlePrint}
+        >
           Print Invoice
         </Button>
+
       </div>
+
     </div>
   );
 };
